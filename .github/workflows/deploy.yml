@@ -3,7 +3,7 @@ name: Deploy Lambda
 
 on:
   push:
-    branches: [master]
+    branches: [master, dev]
 
 jobs:
   Deploy:
@@ -13,10 +13,10 @@ jobs:
         node-version: [16.x]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install Packages Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -29,3 +29,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         with:
           args: deploy
+          stage: ${{ env.STAGE }}
