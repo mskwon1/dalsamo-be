@@ -1,13 +1,14 @@
-# .github/workflows/deploy.yml
-name: Deploy Lambda
+# .github/workflows/deploy-prod.yml
+name: Deploy Lambda Prod
 
 on:
   push:
-    branches: [master, dev]
+    branches: [master]
 
 jobs:
   Deploy:
     runs-on: ubuntu-latest
+    environment: prod
     strategy:
       matrix:
         node-version: [16.x]
@@ -21,8 +22,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - run: yarn install --frozen-lockfile
-
-      - run: echo "Env var STAGE - ${{ vars.STAGE }}" 
 
       - name: Serverless Deploy
         uses: serverless/github-action@v3.1.0
