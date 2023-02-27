@@ -3,7 +3,7 @@ name: Deploy Lambda
 
 on:
   push:
-    branches: [master]
+    branches: [master, dev]
 
 jobs:
   Deploy:
@@ -29,3 +29,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         with:
           args: deploy
+          stage: ${{ env.STAGE }}
