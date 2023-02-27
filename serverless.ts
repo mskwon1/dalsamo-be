@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 
-import functions from '@functions';
+import functions from '@functions/index';
 
 const serverlessConfiguration: AWS = {
   service: 'dalsamo-be',
