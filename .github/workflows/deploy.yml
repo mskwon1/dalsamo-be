@@ -1,14 +1,14 @@
-# .github/workflows/deploy-dev.yml
-name: Deploy Lambda Dev
+# .github/workflows/deploy-prod.yml
+name: Deploy Lambda
 
 on:
   push:
-    branches: [dev]
+    branches: [master, dev]
 
 jobs:
   Deploy:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: fromJSON('{"master":"prod","dev":"dev"}')[github.ref]
     strategy:
       matrix:
         node-version: [16.x]
