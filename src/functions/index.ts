@@ -3,7 +3,7 @@ import { default as helloWorld } from './hello-world';
 
 const functions = {
   hello,
-  helloWorld
-}
+  helloWorld,
+};
 
 export default functions;
