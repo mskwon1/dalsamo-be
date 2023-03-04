@@ -8,7 +8,7 @@ on:
 jobs:
   Deploy:
     runs-on: ubuntu-latest
-    environment: fromJSON('{"master":"prod","dev":"dev"}')[github.ref]
+    environment: ${{ fromJSON('{"master":"prod","dev":"dev"}')[github.ref] }}
     strategy:
       matrix:
         node-version: [16.x]
