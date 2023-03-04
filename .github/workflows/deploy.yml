@@ -11,13 +11,15 @@ env:
 jobs:
   Deploy:
     runs-on: ubuntu-latest
-    environment: ${{ env.stage }}
+    environment: ${{ github.ref == 'master' && 'prod' || 'dev' }}
     strategy:
       matrix:
         node-version: [16.x]
     steps:
-      - name: Echo Stage
-        run: echo ${{ env.stage }}
+      - name: Echo ref
+        run: echo ${{ github.ref }}
+      - name: Echo var stage
+        run: echo ${{ vars.STAGE }}
       - name: Checkout
         uses: actions/checkout@v3
 
