@@ -1,18 +1,25 @@
-# .github/workflows/deploy-dev.yml
-name: Deploy Lambda Dev
+# .github/workflows/deploy-prod.yml
+name: Deploy Lambda
 
 on:
   push:
-    branches: [dev]
+    branches: [master, dev]
+
+env:
+  stage: ${{ fromJSON('{"master":"prod","dev":"dev"}')[github.ref] }}
 
 jobs:
   Deploy:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: ${{ github.ref == 'master' && 'prod' || 'dev' }}
     strategy:
       matrix:
         node-version: [16.x]
     steps:
+      - name: Echo ref
+        run: echo ${{ github.ref }}
+      - name: Echo var stage
+        run: echo ${{ vars.STAGE }}
       - name: Checkout
         uses: actions/checkout@v3
 
