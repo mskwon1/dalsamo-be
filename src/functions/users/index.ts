@@ -3,7 +3,7 @@ import { handlerPath } from '@libs/handler-resolver';
 import { AWS, AwsIamPolicyStatements } from '@serverless/typescript';
 
 type LambdaFunctionEntry = AWS['functions'][keyof AWS['functions']] & {
-  iamRoleStatments?: AwsIamPolicyStatements;
+  iamRoleStatements?: AwsIamPolicyStatements;
 };
 
 const func: LambdaFunctionEntry = {
@@ -21,7 +21,7 @@ const func: LambdaFunctionEntry = {
       },
     },
   ],
-  iamRoleStatments: [
+  iamRoleStatements: [
     {
       Effect: 'Allow',
       Action: ['dynamodb:PutItem'],
