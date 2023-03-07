@@ -1,7 +1,12 @@
 import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
+import { AWS, AwsIamPolicyStatements } from '@serverless/typescript';
 
-export default {
+type LambdaFunctionEntry = AWS['functions'][keyof AWS['functions']] & {
+  iamRoleStatments?: AwsIamPolicyStatements;
+};
+
+const func: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
@@ -16,4 +21,13 @@ export default {
       },
     },
   ],
+  iamRoleStatments: [
+    {
+      Effect: 'Allow',
+      Action: ['dynamodb:PutItem'],
+      Resource: 'arn:aws:dynamodb:ap-northeast-2:497580819378:table/Users',
+    },
+  ],
 };
+
+export default func;

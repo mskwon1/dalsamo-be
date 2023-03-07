@@ -18,13 +18,6 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
     },
-    iamRoleStatements: [
-      {
-        Effect: 'Allow',
-        Action: ['dynamodb:PutItem'],
-        Resource: 'arn:aws:dynamodb:ap-northeast-2:497580819378:table/Users',
-      },
-    ],
   },
   // import the function via paths
   functions: functions,
