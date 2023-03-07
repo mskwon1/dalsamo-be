@@ -1,10 +1,6 @@
 import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
-import { AWS, AwsIamPolicyStatements } from '@serverless/typescript';
-
-type LambdaFunctionEntry = AWS['functions'][keyof AWS['functions']] & {
-  iamRoleStatements?: AwsIamPolicyStatements;
-};
+import { LambdaFunctionEntry } from 'src/utils';
 
 const func: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
