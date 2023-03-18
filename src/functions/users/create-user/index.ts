@@ -21,7 +21,7 @@ const createUser: LambdaFunctionEntry = {
     {
       Effect: 'Allow',
       Action: ['dynamodb:PutItem'],
-      Resource: { 'Fn::GetAtt': ['dalsamoSingleTable', 'arn'] },
+      Resource: { 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] },
     },
   ],
 };
