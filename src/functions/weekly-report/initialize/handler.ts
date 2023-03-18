@@ -3,18 +3,18 @@ import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { v1 as uuidV1 } from 'uuid';
 import {
+  AttributeValue,
   BatchWriteItemCommand,
   DynamoDBClient,
-  PutItemCommand,
-  QueryCommand,
   ScanCommand,
+  WriteRequest,
 } from '@aws-sdk/client-dynamodb';
-
+import * as _ from 'lodash';
 import schema from './schema';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
-const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
+const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   event
 ) => {
   const { startDate } = event.body;
@@ -23,7 +23,11 @@ const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
   const readUsersCommand = new ScanCommand({
     TableName: 'dalsamo-single-table',
+    FilterExpression: 'entityType = user',
   });
+
+  const { Items: users } = await client.send(readUsersCommand);
+  console.log(users);
 
   const initializeCommand = new BatchWriteItemCommand({
     RequestItems: {
@@ -39,6 +43,9 @@ const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
             },
           },
         },
+        ...users.map((user) =>
+          createRunEntryPutRequest({ weeklyReportId, user })
+        ),
       ],
     },
   });
@@ -48,16 +55,44 @@ const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   } catch (error) {
     console.log(error);
     return formatJSONResponse({
-      message: 'weekly report create failed',
+      message: 'weekly report initialize failed',
       event,
       error,
     });
   }
 
   return formatJSONResponse({
-    message: `weekly report created - ${weeklyReportId}`,
+    message: `weekly report initialized - ${weeklyReportId}`,
     event,
   });
 };
 
-export const main = middyfy(hello);
+const createRunEntryPutRequest = (params: {
+  weeklyReportId: string;
+  user: Record<string, AttributeValue>;
+}): WriteRequest => {
+  const {
+    weeklyReportId,
+    user: {
+      PK: { S: userId },
+      currentGoal: { N: currentGoal },
+    },
+  } = params;
+
+  const runEntryId = uuidV1();
+
+  return {
+    PutRequest: {
+      Item: {
+        PK: { S: `weeklyReport#${weeklyReportId}` },
+        SK: { S: `runEntry#${runEntryId}` },
+        entityType: { S: 'runEntry' },
+        runDistance: { NULL: true },
+        goalDistance: { N: `${currentGoal || 7}` },
+        GSI: { S: userId },
+      },
+    },
+  };
+};
+
+export const main = middyfy(handler);
