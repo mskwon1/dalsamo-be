@@ -19,6 +19,67 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
     },
   },
+  resources: {
+    Resources: {
+      dalsamoSingleTable: {
+        Type: 'AWS::DynamoDB::Table',
+        Properties: {
+          KeySchema: [
+            {
+              AttributeName: 'PK',
+              KeyType: 'HASH',
+            },
+            {
+              AttributeName: 'SK',
+              KeyType: 'RANGE',
+            },
+          ],
+          AttributeDefinitions: [
+            {
+              AttributeName: 'PK',
+              AttributeType: 'S',
+            },
+            {
+              AttributeName: 'SK',
+              AttributeType: 'S',
+            },
+            {
+              AttributeName: 'GSI',
+              AttributeType: 'S',
+            },
+          ],
+          GlobalSecondaryIndexes: [
+            {
+              IndexName: 'gsi_sk',
+              KeySchema: [
+                {
+                  AttributeName: 'GSI',
+                  KeyType: 'HASH',
+                },
+                {
+                  AttributeName: 'SK',
+                  KeyType: 'RANGE',
+                },
+              ],
+              Projection: {
+                ProjectionType: 'ALL',
+              },
+              ProvisionedThroughput: {
+                ReadCapacityUnits: 1,
+                WriteCapacityUnits: 1,
+              },
+            },
+          ],
+          BillingMode: 'PROVISIONED',
+          TableName: 'dalsamo-single-table',
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1,
+          },
+        },
+      },
+    },
+  },
   // import the function via paths
   functions: functions,
   package: { individually: true },

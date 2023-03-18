@@ -16,20 +16,24 @@ const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   const userId = uuidV1();
 
   const command = new PutItemCommand({
-    TableName: 'Users',
-    Item: { userId: { S: userId }, name: { S: name }, email: { S: email } },
+    TableName: 'dalsamo-single-table',
+    Item: {
+      PK: { S: `user#${userId}` },
+      SK: { S: `user#${userId}` },
+      entityType: { S: 'user' },
+      name: { S: name },
+      email: email ? { S: email } : { NULL: true },
+    },
   });
 
   try {
     await client.send(command);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
+    return formatJSONResponse({ message: 'user create failed', event, error });
   }
 
-  return formatJSONResponse({
-    message: `Hello ${event.body.name}, welcome to the exciting Serverless world!`,
-    event,
-  });
+  return formatJSONResponse({ message: `user created - ${userId}`, event });
 };
 
 export const main = middyfy(hello);

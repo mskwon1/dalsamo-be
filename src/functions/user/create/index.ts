@@ -2,13 +2,13 @@ import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
-const func: LambdaFunctionEntry = {
+const createUser: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
       http: {
         method: 'post',
-        path: 'create-user',
+        path: 'users',
         request: {
           schemas: {
             'application/json': schema,
@@ -21,9 +21,9 @@ const func: LambdaFunctionEntry = {
     {
       Effect: 'Allow',
       Action: ['dynamodb:PutItem'],
-      Resource: 'arn:aws:dynamodb:ap-northeast-2:497580819378:table/Users',
+      Resource: { 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] },
     },
   ],
 };
 
-export default func;
+export default createUser;

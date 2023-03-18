@@ -1,11 +1,9 @@
-import { default as hello } from './hello';
-import { default as helloWorld } from './hello-world';
-import { default as createUser } from './users';
+import createUser from './user/create';
+import initializeWeeklyReport from './weekly-report/initialize';
 
 const functions = {
-  hello,
-  helloWorld,
   createUser,
+  initializeWeeklyReport,
 };
 
 export default functions;
