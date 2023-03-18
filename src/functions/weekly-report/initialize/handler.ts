@@ -23,7 +23,8 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
   const readUsersCommand = new ScanCommand({
     TableName: 'dalsamo-single-table',
-    FilterExpression: 'entityType = user',
+    FilterExpression: 'entityType = :val',
+    ExpressionAttributeValues: { ':val': { S: 'user' } },
   });
 
   const { Items: users } = await client.send(readUsersCommand);
@@ -75,7 +76,6 @@ const createRunEntryPutRequest = (params: {
     weeklyReportId,
     user: {
       PK: { S: userId },
-      currentGoal: { N: currentGoal },
     },
   } = params;
 
@@ -88,7 +88,7 @@ const createRunEntryPutRequest = (params: {
         SK: { S: `runEntry#${runEntryId}` },
         entityType: { S: 'runEntry' },
         runDistance: { NULL: true },
-        goalDistance: { N: `${currentGoal || 7}` },
+        goalDistance: { N: `${7}` },
         GSI: { S: userId },
       },
     },
