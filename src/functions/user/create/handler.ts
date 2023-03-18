@@ -22,7 +22,7 @@ const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
       SK: { S: `user#${userId}` },
       entityType: { S: 'user' },
       name: { S: name },
-      email: { S: email },
+      email: email ? { S: email } : { NULL: true },
     },
   });
 

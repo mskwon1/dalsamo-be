@@ -2,7 +2,13 @@ import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { v1 as uuidV1 } from 'uuid';
-import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import {
+  BatchWriteItemCommand,
+  DynamoDBClient,
+  PutItemCommand,
+  QueryCommand,
+  ScanCommand,
+} from '@aws-sdk/client-dynamodb';
 
 import schema from './schema';
 
@@ -15,19 +21,30 @@ const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
   const weeklyReportId = uuidV1();
 
-  const command = new PutItemCommand({
+  const readUsersCommand = new ScanCommand({
     TableName: 'dalsamo-single-table',
-    Item: {
-      PK: { S: `weeklyReport#${weeklyReportId}` },
-      SK: { S: `weeklyReport#${weeklyReportId}` },
-      entityType: { S: 'weeklyReport' },
-      startDate: { S: startDate },
-      status: { S: 'pending' },
+  });
+
+  const initializeCommand = new BatchWriteItemCommand({
+    RequestItems: {
+      'dalsamo-single-table': [
+        {
+          PutRequest: {
+            Item: {
+              PK: { S: `weeklyReport#${weeklyReportId}` },
+              SK: { S: `weeklyReport#${weeklyReportId}` },
+              entityType: { S: 'weeklyReport' },
+              startDate: { S: startDate },
+              status: { S: 'pending' },
+            },
+          },
+        },
+      ],
     },
   });
 
   try {
-    await client.send(command);
+    await client.send(initializeCommand);
   } catch (error) {
     console.log(error);
     return formatJSONResponse({
