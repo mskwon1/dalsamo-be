@@ -8,7 +8,7 @@ const createUser: LambdaFunctionEntry = {
     {
       http: {
         method: 'post',
-        path: 'create-user',
+        path: 'users',
         request: {
           schemas: {
             'application/json': schema,
