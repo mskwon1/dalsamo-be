@@ -1,10 +1,6 @@
-import { default as hello } from './hello';
-import { default as helloWorld } from './hello-world';
-import { default as createUser } from './users';
+import createUser from './users/create-user';
 
 const functions = {
-  hello,
-  helloWorld,
   createUser,
 };
 

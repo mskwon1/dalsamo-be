@@ -2,7 +2,7 @@ import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
-const func: LambdaFunctionEntry = {
+const createUser: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
@@ -26,4 +26,4 @@ const func: LambdaFunctionEntry = {
   ],
 };
 
-export default func;
+export default createUser;
