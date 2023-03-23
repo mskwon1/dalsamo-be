@@ -47,6 +47,10 @@ const serverlessConfiguration: AWS = {
               AttributeName: 'GSI',
               AttributeType: 'S',
             },
+            {
+              AttributeName: 'EntityType',
+              AttributeType: 'S',
+            },
           ],
           GlobalSecondaryIndexes: [
             {
