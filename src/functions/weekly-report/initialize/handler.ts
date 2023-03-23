@@ -3,14 +3,13 @@ import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { v1 as uuidV1 } from 'uuid';
 import {
-  AttributeValue,
   BatchWriteItemCommand,
   DynamoDBClient,
-  ScanCommand,
   WriteRequest,
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
 import schema from './schema';
+import UserService from 'src/services/userService';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
@@ -21,14 +20,8 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
   const weeklyReportId = uuidV1();
 
-  const readUsersCommand = new ScanCommand({
-    TableName: 'dalsamo-single-table',
-    FilterExpression: 'entityType = :val',
-    ExpressionAttributeValues: { ':val': { S: 'user' } },
-  });
-
-  const { Items: users } = await client.send(readUsersCommand);
-  console.log(users);
+  const userService = new UserService();
+  const users = await userService.findAll({ limit: 50 });
 
   const initializeCommand = new BatchWriteItemCommand({
     RequestItems: {
@@ -70,13 +63,11 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
 const createRunEntryPutRequest = (params: {
   weeklyReportId: string;
-  user: Record<string, AttributeValue>;
+  user: UserEntity;
 }): WriteRequest => {
   const {
     weeklyReportId,
-    user: {
-      PK: { S: userId },
-    },
+    user: { id, currentGoal },
   } = params;
 
   const runEntryId = uuidV1();
@@ -87,9 +78,9 @@ const createRunEntryPutRequest = (params: {
         PK: { S: `weeklyReport#${weeklyReportId}` },
         SK: { S: `runEntry#${runEntryId}` },
         entityType: { S: 'runEntry' },
-        runDistance: { NULL: true },
-        goalDistance: { N: `${7}` },
-        GSI: { S: userId },
+        runDistance: { N: '0' },
+        goalDistance: { N: `${currentGoal}` },
+        GSI: { S: id },
       },
     },
   };
