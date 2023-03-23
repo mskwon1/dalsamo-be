@@ -7,7 +7,6 @@ import {
   DynamoDBClient,
   WriteRequest,
 } from '@aws-sdk/client-dynamodb';
-import * as _ from 'lodash';
 import schema from './schema';
 import UserService from 'src/services/userService';
 

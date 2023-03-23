@@ -20,7 +20,7 @@ const initializeWeeklyReport: LambdaFunctionEntry = {
   iamRoleStatements: [
     {
       Effect: 'Allow',
-      Action: ['dynamodb:PutItem', 'dynamodb:Scan', 'dynamodb:BatchWriteItem'],
+      Action: ['dynamodb:PutItem', 'dynamodb:Query', 'dynamodb:BatchWriteItem'],
       Resource: { 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] },
     },
   ],
