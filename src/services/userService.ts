@@ -20,7 +20,7 @@ class UserService {
       TableName: 'dalsamo-single-table',
       Limit: limit,
       IndexName: DBIndexName.ET_PK,
-      KeyConditionExpression: 'EntityType = :pk_val',
+      KeyConditionExpression: 'entityType = :pk_val',
       ExpressionAttributeValues: { ':pk_val': { S: 'user' } },
     });
 
