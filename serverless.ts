@@ -48,7 +48,7 @@ const serverlessConfiguration: AWS = {
               AttributeType: 'S',
             },
             {
-              AttributeName: 'entityType',
+              AttributeName: 'EntityType',
               AttributeType: 'S',
             },
           ],
@@ -74,10 +74,10 @@ const serverlessConfiguration: AWS = {
               },
             },
             {
-              IndexName: 'et_pk_2',
+              IndexName: 'et_pk',
               KeySchema: [
                 {
-                  AttributeName: 'entityType',
+                  AttributeName: 'EntityType',
                   KeyType: 'HASH',
                 },
                 {

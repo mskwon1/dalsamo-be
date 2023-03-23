@@ -26,7 +26,7 @@ class WeeklyReportService {
       Item: {
         PK: { S: `weeklyReport#${id}` },
         SK: { S: `weeklyReport#${id}` },
-        entityType: { S: 'weeklyReport' },
+        EntityType: { S: 'weeklyReport' },
         startDate: { S: startDate },
         status: { S: status },
       },

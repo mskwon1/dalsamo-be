@@ -30,7 +30,7 @@ class RunEntryService {
       Item: {
         PK: { S: `weeklyReport#${weeklyReportId}` },
         SK: { S: `runEntry#${id}` },
-        entityType: { S: 'runEntry' },
+        EntityType: { S: 'runEntry' },
         runDistance: { N: `${runDistance}` },
         goalDistance: { N: `${goalDistance}` },
         GSI: { S: userId },
