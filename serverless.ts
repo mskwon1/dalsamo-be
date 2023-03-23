@@ -69,6 +69,26 @@ const serverlessConfiguration: AWS = {
                 WriteCapacityUnits: 1,
               },
             },
+            {
+              IndexName: 'et_pk',
+              KeySchema: [
+                {
+                  AttributeName: 'EntityType',
+                  KeyType: 'HASH',
+                },
+                {
+                  AttributeName: 'PK',
+                  KeyType: 'RANGE',
+                },
+              ],
+              Projection: {
+                ProjectionType: 'ALL',
+              },
+              ProvisionedThroughput: {
+                ReadCapacityUnits: 1,
+                WriteCapacityUnits: 1,
+              },
+            },
           ],
           BillingMode: 'PROVISIONED',
           TableName: 'dalsamo-single-table',
