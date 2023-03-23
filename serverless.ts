@@ -5,7 +5,11 @@ import functions from '@functions/index';
 const serverlessConfiguration: AWS = {
   service: 'dalsamo-be',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild', 'serverless-iam-roles-per-function'],
+  plugins: [
+    'serverless-esbuild',
+    'serverless-iam-roles-per-function',
+    'serverless-dotenv-plugin',
+  ],
   provider: {
     name: 'aws',
     runtime: 'nodejs16.x',
@@ -95,7 +99,7 @@ const serverlessConfiguration: AWS = {
             },
           ],
           BillingMode: 'PROVISIONED',
-          TableName: 'dalsamo-single-table',
+          TableName: '${sls:stage}-dalsamo-single-table',
           ProvisionedThroughput: {
             ReadCapacityUnits: 1,
             WriteCapacityUnits: 1,

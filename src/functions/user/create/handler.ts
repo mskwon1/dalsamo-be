@@ -16,7 +16,7 @@ const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   const userId = uuidV1();
 
   const command = new PutItemCommand({
-    TableName: 'dalsamo-single-table',
+    TableName: `${process.env.STAGE}-dalsamo-single-table`,
     Item: {
       PK: { S: `user#${userId}` },
       SK: { S: `user#${userId}` },
