@@ -23,12 +23,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Create .env file
-        run: |
-          touch .env
-          echo STAGE=${{ vars.STAGE }} >> .env
-          cat .env
-
       - name: Install Packages Node ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
