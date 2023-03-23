@@ -28,7 +28,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
   const initializeCommand = new BatchWriteItemCommand({
     RequestItems: {
-      'dalsamo-single-table': [
+      [`${process.env.STAGE}-dalsamo-single-table`]: [
         {
           PutRequest: weeklyReportService.generatePutRequest({
             status: 'pending',

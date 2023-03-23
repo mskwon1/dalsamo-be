@@ -95,7 +95,7 @@ const serverlessConfiguration: AWS = {
             },
           ],
           BillingMode: 'PROVISIONED',
-          TableName: 'dalsamo-single-table',
+          TableName: '${sls:stage}-dalsamo-single-table',
           ProvisionedThroughput: {
             ReadCapacityUnits: 1,
             WriteCapacityUnits: 1,
