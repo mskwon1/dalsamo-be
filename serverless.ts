@@ -74,7 +74,7 @@ const serverlessConfiguration: AWS = {
               },
             },
             {
-              IndexName: 'et_pk',
+              IndexName: 'et_pk_2',
               KeySchema: [
                 {
                   AttributeName: 'entityType',
