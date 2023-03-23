@@ -5,8 +5,11 @@ import functions from '@functions/index';
 const serverlessConfiguration: AWS = {
   service: 'dalsamo-be',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild', 'serverless-iam-roles-per-function'],
-  useDotenv: true,
+  plugins: [
+    'serverless-esbuild',
+    'serverless-iam-roles-per-function',
+    'serverless-dotenv-plugin',
+  ],
   provider: {
     name: 'aws',
     runtime: 'nodejs16.x',
