@@ -6,6 +6,7 @@ const serverlessConfiguration: AWS = {
   service: 'dalsamo-be',
   frameworkVersion: '3',
   plugins: ['serverless-esbuild', 'serverless-iam-roles-per-function'],
+  useDotenv: true,
   provider: {
     name: 'aws',
     runtime: 'nodejs16.x',
