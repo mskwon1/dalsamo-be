@@ -8,21 +8,21 @@ import UserService from 'src/services/userService';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
-const createUser: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
+const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   event
 ) => {
-  const { name, email } = event.body;
+  const { limit } = event.body;
 
   const userService = new UserService(client);
 
   try {
-    const userId = await userService.create({ name, email });
+    const users = await userService.findAll({ limit });
 
-    return formatJSONResponse({ message: `user created - ${userId}`, event });
+    return formatJSONResponse({ users });
   } catch (error) {
     console.log(error);
-    return formatJSONResponse({ message: 'user create failed', event, error });
+    return formatJSONResponse({ message: 'findAll user failed', event, error });
   }
 };
 
-export const main = middyfy(createUser);
+export const main = middyfy(hello);

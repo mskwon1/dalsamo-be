@@ -2,13 +2,13 @@ import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
-const initializeWeeklyReport: LambdaFunctionEntry = {
+const findAllUsers: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
       http: {
-        method: 'post',
-        path: 'weekly-reports',
+        method: 'get',
+        path: 'users',
         request: {
           schemas: {
             'application/json': schema,
@@ -20,7 +20,7 @@ const initializeWeeklyReport: LambdaFunctionEntry = {
   iamRoleStatements: [
     {
       Effect: 'Allow',
-      Action: ['dynamodb:*'],
+      Action: ['dynamodb:Query'],
       Resource: [
         { 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] },
         {
@@ -34,4 +34,4 @@ const initializeWeeklyReport: LambdaFunctionEntry = {
   ],
 };
 
-export default initializeWeeklyReport;
+export default findAllUsers;

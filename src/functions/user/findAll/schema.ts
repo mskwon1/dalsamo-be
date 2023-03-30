@@ -1,9 +1,8 @@
 const schema = {
   type: 'object',
   properties: {
-    startDate: { type: 'string' },
+    limit: { type: 'number' },
   },
-  required: ['startDate'],
 } as const;
 
 export default schema;
