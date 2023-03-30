@@ -1,9 +1,14 @@
-import { DynamoDBClient, PutRequest } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  PutItemCommand,
+  PutRequest,
+  ReturnConsumedCapacity,
+} from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
+import { DALSAMO_SINGLE_TABLE } from 'src/constants';
 import { v1 as uuidV1 } from 'uuid';
 
 type CreateWeeklyReportParams = {
-  weeklyReportId?: string;
   startDate: string;
   status: 'pending' | 'confirmed';
 };
@@ -11,21 +16,44 @@ type CreateWeeklyReportParams = {
 class WeeklyReportService {
   private client: DynamoDBClient;
 
-  constructor() {
-    this.client = new DynamoDBClient({ region: 'ap-northeast-2' });
+  constructor(client: DynamoDBClient) {
+    this.client = client;
+  }
+
+  private generateId() {
+    return uuidV1();
+  }
+
+  async create(params: CreateWeeklyReportParams): Promise<string> {
+    const weeklyReportId = this.generateId();
+
+    const command = new PutItemCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      ...this.generatePutRequest({
+        weeklyReportId,
+        ...params,
+      }),
+      ReturnConsumedCapacity: ReturnConsumedCapacity.TOTAL,
+    });
+
+    await this.client.send(command);
+
+    return weeklyReportId;
   }
 
   generatePutRequest({
     weeklyReportId,
     startDate,
     status,
-  }: CreateWeeklyReportParams): PutRequest {
-    const id = weeklyReportId || uuidV1();
-
+  }: {
+    weeklyReportId: string;
+    startDate: string;
+    status: 'pending' | 'confirmed';
+  }): PutRequest {
     return {
       Item: {
-        PK: { S: `weeklyReport#${id}` },
-        SK: { S: `weeklyReport#${id}` },
+        PK: { S: `weeklyReport#${weeklyReportId}` },
+        SK: { S: `weeklyReport#${weeklyReportId}` },
         EntityType: { S: 'weeklyReport' },
         startDate: { S: startDate },
         status: { S: status },

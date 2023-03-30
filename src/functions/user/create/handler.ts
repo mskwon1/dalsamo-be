@@ -1,39 +1,28 @@
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
-import { v1 as uuidV1 } from 'uuid';
-import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
 import schema from './schema';
+import UserService from 'src/services/userService';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
-const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
+const createUser: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   event
 ) => {
   const { name, email } = event.body;
 
-  const userId = uuidV1();
-
-  const command = new PutItemCommand({
-    TableName: `${process.env.STAGE}-dalsamo-single-table`,
-    Item: {
-      PK: { S: `user#${userId}` },
-      SK: { S: `user#${userId}` },
-      EntityType: { S: 'user' },
-      name: { S: name },
-      email: email ? { S: email } : { NULL: true },
-    },
-  });
+  const userService = new UserService(client);
 
   try {
-    await client.send(command);
+    const userId = await userService.create({ name, email });
+
+    return formatJSONResponse({ message: `user created - ${userId}`, event });
   } catch (error) {
     console.log(error);
     return formatJSONResponse({ message: 'user create failed', event, error });
   }
-
-  return formatJSONResponse({ message: `user created - ${userId}`, event });
 };
 
-export const main = middyfy(hello);
+export const main = middyfy(createUser);

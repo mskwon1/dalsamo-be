@@ -1,9 +1,11 @@
+import findAllUsers from './user/findAll';
 import createUser from './user/create';
-import initializeWeeklyReport from './weekly-report/initialize';
+import createWeeklyReport from './weekly-report/create';
 
 const functions = {
+  findAllUsers,
   createUser,
-  initializeWeeklyReport,
+  createWeeklyReport,
 };
 
 export default functions;

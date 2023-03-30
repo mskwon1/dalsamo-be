@@ -1,16 +1,29 @@
 import {
   AttributeValue,
   DynamoDBClient,
+  PutItemCommand,
   QueryCommand,
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
-import { DBIndexName } from 'src/constants';
+import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
+import { v1 as uuidV1 } from 'uuid';
+
+type CreateUserParams = {
+  name: string;
+  email?: string;
+};
+
+const DEFAULT_GOAL = 7;
 
 class UserService {
   private client: DynamoDBClient;
 
-  constructor() {
-    this.client = new DynamoDBClient({ region: 'ap-northeast-2' });
+  constructor(client: DynamoDBClient) {
+    this.client = client;
+  }
+
+  private generateId() {
+    return uuidV1();
   }
 
   async findAll(params: { limit?: number }): Promise<UserEntity[]> {
@@ -29,6 +42,28 @@ class UserService {
     return _.map(users, this.parseUserDocument);
   }
 
+  async create(params: CreateUserParams) {
+    const { name, email } = params;
+
+    const userId = this.generateId();
+
+    const command = new PutItemCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      Item: {
+        PK: { S: `user#${userId}` },
+        SK: { S: `user#${userId}` },
+        EntityType: { S: 'user' },
+        name: { S: name },
+        email: email ? { S: email } : { NULL: true },
+        currentGoal: { N: `${DEFAULT_GOAL}` },
+      },
+    });
+
+    await this.client.send(command);
+
+    return userId;
+  }
+
   parseUserDocument(userDocument: Record<string, AttributeValue>): UserEntity {
     const {
       PK: { S: id },
@@ -38,7 +73,7 @@ class UserService {
     } = userDocument;
 
     return {
-      id,
+      id: _.split(id, '#')[1],
       email: email?.S ? email.S : null,
       currentGoal: _.toNumber(currentGoal),
       name,
