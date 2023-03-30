@@ -69,7 +69,7 @@ class RunEntryService {
         EntityType: { S: 'runEntry' },
         runDistance: { N: `${runDistance}` },
         goalDistance: { N: `${goalDistance}` },
-        GSI: { S: userId },
+        GSI: { S: `user#${userId}` },
       },
     };
   }
