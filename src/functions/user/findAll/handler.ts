@@ -1,22 +1,21 @@
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-
-import schema from './schema';
 import UserService from 'src/services/userService';
+import { APIGatewayProxyHandler } from 'aws-lambda';
+import * as _ from 'lodash';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
-const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
-  event
-) => {
-  const { limit } = event.body;
+const findAllUsers: APIGatewayProxyHandler = async (event) => {
+  const {
+    queryStringParameters: { limit },
+  } = event;
 
   const userService = new UserService(client);
 
   try {
-    const users = await userService.findAll({ limit });
+    const users = await userService.findAll({ limit: _.toNumber(limit) });
 
     return formatJSONResponse({ users });
   } catch (error) {
@@ -25,4 +24,4 @@ const hello: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   }
 };
 
-export const main = middyfy(hello);
+export const main = middyfy(findAllUsers);

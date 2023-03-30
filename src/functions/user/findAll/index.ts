@@ -1,4 +1,3 @@
-import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
@@ -10,8 +9,8 @@ const findAllUsers: LambdaFunctionEntry = {
         method: 'get',
         path: 'users',
         request: {
-          schemas: {
-            'application/json': schema,
+          parameters: {
+            querystrings: { limit: true },
           },
         },
       },
