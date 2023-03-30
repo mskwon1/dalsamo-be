@@ -13,6 +13,8 @@ type CreateUserParams = {
   email?: string;
 };
 
+const DEFAULT_GOAL = 7;
+
 class UserService {
   private client: DynamoDBClient;
 
@@ -53,6 +55,7 @@ class UserService {
         EntityType: { S: 'user' },
         name: { S: name },
         email: email ? { S: email } : { NULL: true },
+        currentGoal: { N: `${DEFAULT_GOAL}` },
       },
     });
 
