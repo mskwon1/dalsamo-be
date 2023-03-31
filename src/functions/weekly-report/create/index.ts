@@ -14,6 +14,9 @@ const createWeeklyReport: LambdaFunctionEntry = {
             'application/json': schema,
           },
         },
+        cors: {
+          origins: ['https://*.mskwon.click'],
+        },
       },
     },
   ],
