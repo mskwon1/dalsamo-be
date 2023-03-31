@@ -15,7 +15,7 @@ const createUser: LambdaFunctionEntry = {
           },
         },
         cors: {
-          origins: ['https://*.mskwon.click'],
+          origins: ['https://*.mskwon.click', '*'],
         },
       },
     },
