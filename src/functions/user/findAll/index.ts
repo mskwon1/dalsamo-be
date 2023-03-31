@@ -10,7 +10,7 @@ const findAllUsers: LambdaFunctionEntry = {
         path: 'users',
         request: {
           parameters: {
-            querystrings: { limit: true },
+            querystrings: { limit: false },
           },
         },
         cors: true,
