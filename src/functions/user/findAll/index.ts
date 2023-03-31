@@ -13,9 +13,7 @@ const findAllUsers: LambdaFunctionEntry = {
             querystrings: { limit: true },
           },
         },
-        cors: {
-          origins: ['https://*.mskwon.click', '*'],
-        },
+        cors: true,
       },
     },
   ],

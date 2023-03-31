@@ -14,9 +14,7 @@ const createUser: LambdaFunctionEntry = {
             'application/json': schema,
           },
         },
-        cors: {
-          origins: ['https://*.mskwon.click', '*'],
-        },
+        cors: true,
       },
     },
   ],
