@@ -30,7 +30,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
       const updatedEntry = await runEntryService.update(
         { weeklyReportId, runEntryId: id },
-        { runDistance, goalDistance }
+        { runDistance, goalDistance, status: 'confirmed' }
       );
 
       const fineValue = FineService.calculateFine({
