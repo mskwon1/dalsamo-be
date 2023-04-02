@@ -9,6 +9,7 @@ import {
 import * as _ from 'lodash';
 import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
 import { v1 as uuidV1 } from 'uuid';
+import RunEntryService from './runEntryService';
 
 type CreateWeeklyReportParams = {
   startDate: string;
@@ -50,11 +51,11 @@ class WeeklyReportService {
 
     const runEntries = _.chain(Items)
       .filter((item) => item.EntityType?.S === 'runEntry')
-      .map(this.parseRunEntryDocument)
+      .map(RunEntryService.parseRunEntryDocument)
       .value();
 
     return {
-      ...this.parseWeeklyReportDocument(weeklyReport),
+      ...WeeklyReportService.parseWeeklyReportDocument(weeklyReport),
       runEntries,
     };
   }
@@ -74,7 +75,7 @@ class WeeklyReportService {
       readWeeklyReportsCommand
     );
 
-    return _.map(weeklyReports, this.parseWeeklyReportDocument);
+    return _.map(weeklyReports, WeeklyReportService.parseWeeklyReportDocument);
   }
 
   async create(params: CreateWeeklyReportParams): Promise<string> {
@@ -114,7 +115,7 @@ class WeeklyReportService {
     };
   }
 
-  parseWeeklyReportDocument(
+  static parseWeeklyReportDocument(
     weeklyReportDocument: Record<string, AttributeValue>
   ): WeeklyReportEntity {
     const {
@@ -128,26 +129,6 @@ class WeeklyReportService {
       startDate,
       status,
     } as WeeklyReportEntity;
-  }
-
-  parseRunEntryDocument(
-    runEntryDocument: Record<string, AttributeValue>
-  ): RunEntryEntity {
-    const {
-      SK: { S: id },
-      goalDistance: { N: goalDistance },
-      runDistance: { N: runDistance },
-      name: { S: name },
-      GSI: { S: userId },
-    } = runEntryDocument;
-
-    return {
-      id: _.split(id, '#')[1],
-      goalDistance: _.toNumber(goalDistance),
-      runDistance: _.toNumber(runDistance),
-      userId,
-      name,
-    };
   }
 }
 
