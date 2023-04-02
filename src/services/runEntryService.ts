@@ -68,12 +68,11 @@ class RunEntryService {
         PK: { S: `weeklyReport#${weeklyReportId}` },
         SK: { S: `runEntry#${runEntryId}` },
       },
-      UpdateExpression:
-        'SET runDistance = :rd, goalDistance = :gd, status=:status',
+      UpdateExpression: 'SET runDistance = :rd, goalDistance = :gd, status=:st',
       ExpressionAttributeValues: {
         ':rd': { N: `${runDistance}` },
         ':gd': { N: `${goalDistance}` },
-        ':status': { S: status },
+        ':st': { S: status },
       },
       ReturnValues: ReturnValue.ALL_NEW,
     });
