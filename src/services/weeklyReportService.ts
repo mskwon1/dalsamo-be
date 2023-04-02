@@ -33,7 +33,7 @@ class WeeklyReportService {
       TableName: DALSAMO_SINGLE_TABLE,
       KeyConditionExpression: 'PK = :pk_val',
       ExpressionAttributeValues: {
-        pk_val: { S: `weeklyReport#${weeklyReportId}` },
+        ':pk_val': { S: `weeklyReport#${weeklyReportId}` },
       },
     });
 
@@ -137,6 +137,7 @@ class WeeklyReportService {
       SK: { S: id },
       goalDistance: { N: goalDistance },
       runDistance: { N: runDistance },
+      name: { S: name },
       GSI: { S: userId },
     } = runEntryDocument;
 
@@ -145,6 +146,7 @@ class WeeklyReportService {
       goalDistance: _.toNumber(goalDistance),
       runDistance: _.toNumber(runDistance),
       userId,
+      name,
     };
   }
 }

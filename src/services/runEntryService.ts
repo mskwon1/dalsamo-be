@@ -11,6 +11,7 @@ import { v1 as uuidV1 } from 'uuid';
 type CreateRunEntryParams = {
   weeklyReportId: string;
   userId: string;
+  name: string;
   runDistance: number;
   goalDistance: number;
 };

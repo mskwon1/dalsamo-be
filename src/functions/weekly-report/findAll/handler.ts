@@ -7,16 +7,15 @@ import WeeklyReportService from 'src/services/weeklyReportService';
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
 const findAllWeeklyReports: APIGatewayProxyHandler = async (event) => {
-  const {
-    queryStringParameters: { limit },
-  } = event;
+  const { queryStringParameters } = event;
+  const limit = queryStringParameters?.limit;
 
   const weeklyReportService = new WeeklyReportService(client);
 
   try {
-    const weeklyReports = await weeklyReportService.findAll({
-      limit: _.toNumber(limit),
-    });
+    const weeklyReports = await weeklyReportService.findAll(
+      limit ? { limit: _.toNumber(limit) } : {}
+    );
 
     return formatJSONResponse({ weeklyReports });
   } catch (error) {

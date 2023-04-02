@@ -8,9 +8,10 @@ const schema = {
         type: 'object',
         properties: {
           userId: { type: 'string' },
+          name: { type: 'string' },
           goalDistance: { type: 'number' },
         },
-        required: ['userId', 'goalDistance'],
+        required: ['userId', 'name', 'goalDistance'],
       },
     },
   },
