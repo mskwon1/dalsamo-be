@@ -3,7 +3,7 @@ type RunEntryEntity = {
   runDistance: number;
   goalDistance: number;
   userId: string;
-  name: string;
+  userName: string;
 };
 
 type WeeklyReportEntity = {

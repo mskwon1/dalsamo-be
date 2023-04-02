@@ -25,13 +25,13 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
     const { createdItemsCount } = await runEntryService.createMany(
       _.map(runEntries, (rawEntry) => {
-        const { userId, goalDistance, name } = rawEntry;
+        const { userId, goalDistance, userName } = rawEntry;
 
         return {
           weeklyReportId,
           runDistance: 0,
           userId,
-          name,
+          userName,
           goalDistance,
         };
       })

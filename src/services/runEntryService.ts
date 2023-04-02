@@ -14,7 +14,7 @@ import { v1 as uuidV1 } from 'uuid';
 type CreateRunEntryParams = {
   weeklyReportId: string;
   userId: string;
-  name: string;
+  userName: string;
   runDistance: number;
   goalDistance: number;
 };
@@ -37,9 +37,7 @@ class RunEntryService {
     const command = new BatchWriteItemCommand({
       RequestItems: {
         [DALSAMO_SINGLE_TABLE]: entries.map((entry) => {
-          return {
-            PutRequest: this.generatePutRequest(entry),
-          };
+          return { PutRequest: this.generatePutRequest(entry) };
         }),
       },
       ReturnConsumedCapacity: ReturnConsumedCapacity.TOTAL,
@@ -86,14 +84,14 @@ class RunEntryService {
     runEntryId,
     weeklyReportId,
     userId,
-    name,
+    userName,
     runDistance,
     goalDistance,
   }: {
     runEntryId?: string;
     weeklyReportId: string;
     userId: string;
-    name: string;
+    userName: string;
     runDistance: number;
     goalDistance: number;
   }): PutRequest {
@@ -107,7 +105,7 @@ class RunEntryService {
         runDistance: { N: `${runDistance}` },
         goalDistance: { N: `${goalDistance}` },
         GSI: { S: `user#${userId}` },
-        name: { S: name },
+        userName: { S: userName },
       },
     };
   }
@@ -119,7 +117,7 @@ class RunEntryService {
       SK: { S: id },
       goalDistance: { N: goalDistance },
       runDistance: { N: runDistance },
-      name: { S: name },
+      userName: { S: userName },
       GSI: { S: userId },
     } = runEntryDocument;
 
@@ -128,7 +126,7 @@ class RunEntryService {
       goalDistance: _.toNumber(goalDistance),
       runDistance: _.toNumber(runDistance),
       userId: _.split(userId, '#')[1],
-      name,
+      userName,
     };
   }
 }
