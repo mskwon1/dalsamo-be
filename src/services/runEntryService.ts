@@ -22,7 +22,6 @@ type CreateRunEntryParams = {
 type UpdateRunEntryParams = {
   runDistance: number;
   goalDistance: number;
-  status: 'pending' | 'confirmed';
 };
 
 class RunEntryService {
@@ -60,7 +59,7 @@ class RunEntryService {
     params: UpdateRunEntryParams
   ): Promise<RunEntryEntity> {
     const { runEntryId, weeklyReportId } = key;
-    const { runDistance, goalDistance, status } = params;
+    const { runDistance, goalDistance } = params;
 
     const updateCommand = new UpdateItemCommand({
       TableName: DALSAMO_SINGLE_TABLE,
@@ -68,11 +67,10 @@ class RunEntryService {
         PK: { S: `weeklyReport#${weeklyReportId}` },
         SK: { S: `runEntry#${runEntryId}` },
       },
-      UpdateExpression: 'SET runDistance = :rd, goalDistance = :gd, status=:st',
+      UpdateExpression: 'SET runDistance = :rd, goalDistance = :gd',
       ExpressionAttributeValues: {
         ':rd': { N: `${runDistance}` },
         ':gd': { N: `${goalDistance}` },
-        ':st': { S: status },
       },
       ReturnValues: ReturnValue.ALL_NEW,
     });

@@ -7,6 +7,7 @@ import RunEntryService from 'src/services/runEntryService';
 import * as _ from 'lodash';
 import FineService from 'src/services/fineService';
 import UserService from 'src/services/userService';
+import WeeklyReportService from 'src/services/weeklyReportService';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
@@ -19,6 +20,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   const { runEntries } = event.body;
 
   const runEntryService = new RunEntryService(client);
+  const weeklyReportService = new WeeklyReportService(client);
   const fineService = new FineService(client);
   const userService = new UserService(client);
 
@@ -30,7 +32,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
       const updatedEntry = await runEntryService.update(
         { weeklyReportId, runEntryId: id },
-        { runDistance, goalDistance, status: 'confirmed' }
+        { runDistance, goalDistance }
       );
 
       const fineValue = FineService.calculateFine({
@@ -61,6 +63,13 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
       console.log({ createdCount });
     }
+
+    const updatedWeeklyReport = await weeklyReportService.update(
+      weeklyReportId,
+      { status: 'confirmed' }
+    );
+
+    console.log(updatedWeeklyReport);
 
     return formatJSONResponse({
       message: `weekly report closed - ${weeklyReportId}`,

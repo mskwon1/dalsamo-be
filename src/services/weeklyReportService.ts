@@ -5,6 +5,8 @@ import {
   PutRequest,
   QueryCommand,
   ReturnConsumedCapacity,
+  ReturnValue,
+  UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
 import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
@@ -13,6 +15,10 @@ import RunEntryService from './runEntryService';
 
 type CreateWeeklyReportParams = {
   startDate: string;
+  status: 'pending' | 'confirmed';
+};
+
+type UpdateWeeklyReportParams = {
   status: 'pending' | 'confirmed';
 };
 
@@ -93,6 +99,31 @@ class WeeklyReportService {
     await this.client.send(command);
 
     return weeklyReportId;
+  }
+
+  async update(
+    weeklyReportId: string,
+    params: UpdateWeeklyReportParams
+  ): Promise<WeeklyReportEntity> {
+    const { status } = params;
+
+    const updateCommand = new UpdateItemCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      Key: {
+        PK: { S: `weeklyReport#${weeklyReportId}` },
+        SK: { S: `weeklyReport#${weeklyReportId}` },
+      },
+      UpdateExpression: 'SET #S = :st',
+      ExpressionAttributeNames: { '#S': 'status' },
+      ExpressionAttributeValues: {
+        ':st': { S: status },
+      },
+      ReturnValues: ReturnValue.ALL_NEW,
+    });
+
+    const { Attributes } = await this.client.send(updateCommand);
+
+    return WeeklyReportService.parseWeeklyReportDocument(Attributes);
   }
 
   generatePutRequest({
