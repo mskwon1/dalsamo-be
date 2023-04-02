@@ -11,6 +11,7 @@ import { v1 as uuidV1 } from 'uuid';
 type CreateUserParams = {
   name: string;
   email?: string;
+  rundayTag?: string;
 };
 
 const DEFAULT_GOAL = 7;
@@ -43,7 +44,7 @@ class UserService {
   }
 
   async create(params: CreateUserParams) {
-    const { name, email } = params;
+    const { name, email, rundayTag } = params;
 
     const userId = this.generateId();
 
@@ -56,6 +57,7 @@ class UserService {
         name: { S: name },
         email: email ? { S: email } : { NULL: true },
         currentGoal: { N: `${DEFAULT_GOAL}` },
+        rundayTag: rundayTag ? { S: rundayTag } : { NULL: true },
       },
     });
 
@@ -70,6 +72,7 @@ class UserService {
       email,
       currentGoal: { N: currentGoal },
       name: { S: name },
+      rundayTag,
     } = userDocument;
 
     return {
@@ -77,6 +80,7 @@ class UserService {
       email: email?.S ? email.S : null,
       currentGoal: _.toNumber(currentGoal),
       name,
+      rundayTag: rundayTag?.S ? rundayTag.S : null,
     };
   }
 }
