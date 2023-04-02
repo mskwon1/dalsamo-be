@@ -30,7 +30,7 @@ class UserService {
     const { limit = 10 } = params;
 
     const readUsersCommand = new QueryCommand({
-      TableName: `${process.env.STAGE}-dalsamo-single-table`,
+      TableName: DALSAMO_SINGLE_TABLE,
       Limit: limit,
       IndexName: DBIndexName.ET_PK,
       KeyConditionExpression: 'EntityType = :pk_val',

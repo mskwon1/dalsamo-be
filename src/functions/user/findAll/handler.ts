@@ -1,5 +1,4 @@
 import { formatJSONResponse } from '@libs/api-gateway';
-import { middyfy } from '@libs/lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import UserService from 'src/services/userService';
 import { APIGatewayProxyHandler } from 'aws-lambda';
@@ -24,4 +23,4 @@ const findAllUsers: APIGatewayProxyHandler = async (event) => {
   }
 };
 
-export const main = middyfy(findAllUsers);
+export const main = findAllUsers;
