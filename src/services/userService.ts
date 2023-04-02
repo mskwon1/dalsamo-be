@@ -3,6 +3,8 @@ import {
   DynamoDBClient,
   PutItemCommand,
   QueryCommand,
+  ReturnValue,
+  UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
 import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
@@ -12,6 +14,10 @@ type CreateUserParams = {
   name: string;
   email?: string;
   rundayTag?: string;
+};
+
+type UpdateUserParams = {
+  currentGoal: number;
 };
 
 const DEFAULT_GOAL = 7;
@@ -40,7 +46,7 @@ class UserService {
 
     const { Items: users } = await this.client.send(readUsersCommand);
 
-    return _.map(users, this.parseUserDocument);
+    return _.map(users, UserService.parseUserDocument);
   }
 
   async create(params: CreateUserParams) {
@@ -66,7 +72,30 @@ class UserService {
     return userId;
   }
 
-  parseUserDocument(userDocument: Record<string, AttributeValue>): UserEntity {
+  async update(userId: string, params: UpdateUserParams) {
+    const { currentGoal } = params;
+
+    const command = new UpdateItemCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      Key: {
+        PK: { S: `user#${userId}` },
+        SK: { S: `user#${userId}` },
+      },
+      UpdateExpression: 'SET currentGoal = :cg',
+      ExpressionAttributeValues: {
+        ':cg': { N: `${currentGoal}` },
+      },
+      ReturnValues: ReturnValue.ALL_NEW,
+    });
+
+    const { Attributes } = await this.client.send(command);
+
+    return UserService.parseUserDocument(Attributes);
+  }
+
+  static parseUserDocument(
+    userDocument: Record<string, AttributeValue>
+  ): UserEntity {
     const {
       PK: { S: id },
       email,

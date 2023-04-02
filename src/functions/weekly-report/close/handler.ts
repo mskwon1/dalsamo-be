@@ -6,6 +6,7 @@ import schema from './schema';
 import RunEntryService from 'src/services/runEntryService';
 import * as _ from 'lodash';
 import FineService from 'src/services/fineService';
+import UserService from 'src/services/userService';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
@@ -19,6 +20,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
   const runEntryService = new RunEntryService(client);
   const fineService = new FineService(client);
+  const userService = new UserService(client);
 
   try {
     const fineTargets = [];
@@ -43,6 +45,12 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
           userName,
           value: fineValue,
         });
+      } else {
+        const updatedUser = await userService.update(userId, {
+          currentGoal: goalDistance + 1,
+        });
+
+        console.log(updatedUser);
       }
 
       console.log(updatedEntry);
