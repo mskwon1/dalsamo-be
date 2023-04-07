@@ -15,6 +15,8 @@ const analyzeCaptureImage: LambdaFunctionEntry = {
       },
     },
   ],
+  timeout: 900,
+  memorySize: 4096,
 };
 
 export default analyzeCaptureImage;

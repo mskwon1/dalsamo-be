@@ -1,4 +1,4 @@
-import { createWorker } from 'tesseract.js';
+import _ from 'lodash';
 
 const USERNAMES_RECTANGLE_PRESET = {
   left: 170,
