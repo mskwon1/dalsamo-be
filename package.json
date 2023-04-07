@@ -12,7 +12,9 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.284.0",
     "@middy/core": "^3.4.0",
+    "@middy/http-header-normalizer": "^4.2.8",
     "@middy/http-json-body-parser": "^3.4.0",
+    "@middy/http-multipart-body-parser": "^4.2.8",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
