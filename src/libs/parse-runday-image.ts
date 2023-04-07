@@ -14,8 +14,10 @@ const DISTANCES_RECTANGLE_PRESET = {
   height: 700,
 };
 
-export const parseRundayImage = async (file: Buffer) => {
-  const worker = await createWorker();
+export const parseRundayImage = async (
+  worker: Tesseract.Worker,
+  file: Buffer
+) => {
   await worker.loadLanguage('eng+kor');
   await worker.initialize('eng+kor');
 
