@@ -121,6 +121,8 @@ const serverlessConfiguration: AWS = {
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
+      external: ['sharp'],
+      packagerOptions: 'npm install --arch=x64 --platform=linux sharp',
     },
   },
 };
