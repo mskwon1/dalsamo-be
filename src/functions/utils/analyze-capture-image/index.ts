@@ -8,6 +8,9 @@ const analyzeCaptureImage: LambdaFunctionEntry = {
       http: {
         method: 'post',
         path: 'utils/analyze-capture-image',
+        request: {
+          contentHandling: 'CONVERT_TO_BINARY',
+        },
         cors: true,
       },
     },

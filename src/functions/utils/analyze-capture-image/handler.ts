@@ -13,6 +13,8 @@ const analyzeCaptureImage = async (event) => {
     console.log(event);
     console.log(event.body);
 
+    console.log(Buffer.from(event.body.image.content).toString('base64'));
+
     const resizedImage = await sharp(event.body.image.content)
       .resize({ width: 648 })
       .toBuffer();
