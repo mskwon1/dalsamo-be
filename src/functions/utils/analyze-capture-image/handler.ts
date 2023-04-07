@@ -1,13 +1,10 @@
 import { formatJSONResponse } from '@libs/api-gateway';
 import middy from '@middy/core';
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import httpHeaderNormalizer from '@middy/http-header-normalizer';
 import httpMultipartBodyParser from '@middy/http-multipart-body-parser';
 import sharp from 'sharp';
 import { parseRundayImage } from '@libs/parse-runday-image';
 import { createWorker } from 'tesseract.js';
-
-const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
 const analyzeCaptureImage = async (event) => {
   try {
@@ -24,6 +21,8 @@ const analyzeCaptureImage = async (event) => {
 
     const worker = await createWorker();
     const parsedData = await parseRundayImage(worker, resizedImage);
+
+    console.log(parsedData);
 
     return formatJSONResponse({
       message: `test analyze capture image`,

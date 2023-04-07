@@ -38,6 +38,8 @@ export const parseRundayImage = async (
     text.replaceAll('km', '')
   );
 
+  console.log({ userNames, distances });
+
   await worker.terminate();
 
   return _.map(userNames, (rawName, index) => {
