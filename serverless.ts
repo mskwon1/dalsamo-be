@@ -17,6 +17,7 @@ const serverlessConfiguration: AWS = {
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
+      binaryMediaTypes: ['multipart/form-data', 'image/png', 'image/jpeg'],
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
