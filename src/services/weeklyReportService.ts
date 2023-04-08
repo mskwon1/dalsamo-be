@@ -138,9 +138,8 @@ class WeeklyReportService {
     return {
       Item: {
         PK: { S: `weeklyReport#${weeklyReportId}` },
-        SK: { S: `weeklyReport#${weeklyReportId}` },
+        SK: { S: startDate },
         EntityType: { S: 'weeklyReport' },
-        startDate: { S: startDate },
         status: { S: status },
       },
     };
@@ -151,7 +150,7 @@ class WeeklyReportService {
   ): WeeklyReportEntity {
     const {
       PK: { S: id },
-      startDate: { S: startDate },
+      SK: { S: startDate },
       status: { S: status },
     } = weeklyReportDocument;
 
