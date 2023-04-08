@@ -56,7 +56,7 @@ class UserService {
       FilterExpression: 'email = :em',
       ExpressionAttributeValues: {
         ':pk_val': { S: 'user' },
-        em: { S: email },
+        ':em': { S: email },
       },
     });
 

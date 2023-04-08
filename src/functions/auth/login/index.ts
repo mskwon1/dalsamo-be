@@ -22,7 +22,15 @@ const login: LambdaFunctionEntry = {
     {
       Effect: 'Allow',
       Action: ['dynamodb:Query'],
-      Resource: { 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] },
+      Resource: [
+        { 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] },
+        {
+          'Fn::Join': [
+            '/',
+            [{ 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] }, 'index/*'],
+          ],
+        },
+      ],
     },
   ],
 };
