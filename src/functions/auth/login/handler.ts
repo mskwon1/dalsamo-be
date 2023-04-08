@@ -42,12 +42,12 @@ const loginHandler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
       });
     }
 
-    const token = signDalsamoJwt(user);
+    const token = await signDalsamoJwt(user);
 
     return formatJSONResponse(
       { message: `user login`, user, success: true },
       {
-        'Set-Cookie': `auth-token=${token}; Domain=${DALSAMO_WEB_DOMAIN}; Secure; HttpOnly`,
+        'Set-Cookie': `auth-token=${token}; Domain=${process.env.DALSAMO_WEB_ORIGIN}; Secure; HttpOnly`,
       }
     );
   } catch (error) {
