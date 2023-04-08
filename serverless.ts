@@ -19,7 +19,7 @@ const serverlessConfiguration: AWS = {
       shouldStartNameWithService: true,
       binaryMediaTypes: ['multipart/form-data', 'image/png', 'image/jpeg'],
       resourcePolicy:
-        '${self:custom.resourcePolicy.${self.provider.stage}}' as unknown as AwsResourcePolicyStatements,
+        '${self:custom.resourcePolicy.${sls:stage}}' as unknown as AwsResourcePolicyStatements,
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
