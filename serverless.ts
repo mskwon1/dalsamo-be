@@ -23,7 +23,7 @@ const serverlessConfiguration: AWS = {
           Effect: 'Allow',
           Principal: '*',
           Action: 'execute-api:Invoke',
-          Resource: 'excute-api:/*/*/*',
+          Resource: 'execute-api:/*/*/*',
         },
         {
           Effect: 'Deny',

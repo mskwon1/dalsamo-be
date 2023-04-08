@@ -74,14 +74,13 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
     return formatJSONResponse({
       message: `weekly report closed - ${weeklyReportId}`,
-      event,
+      result: true,
     });
   } catch (error) {
     console.log(error);
     return formatJSONResponse({
       message: 'weekly report close failed',
-      event,
-      error,
+      result: false,
     });
   }
 };
