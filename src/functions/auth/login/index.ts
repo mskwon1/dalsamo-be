@@ -14,7 +14,11 @@ const login: LambdaFunctionEntry = {
             'application/json': schema,
           },
         },
-        cors: true,
+        cors: {
+          origin: process.env.DALSAMO_WEB_ORIGIN,
+          methods: ['POST'],
+          allowCredentials: true,
+        },
       },
     },
   ],
