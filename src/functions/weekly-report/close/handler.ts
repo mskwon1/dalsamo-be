@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import FineService from 'src/services/fineService';
 import UserService from 'src/services/userService';
 import WeeklyReportService from 'src/services/weeklyReportService';
+import { MAX_GOAL_DISTANCE } from 'src/constants';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
@@ -47,7 +48,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
           userName,
           value: fineValue,
         });
-      } else {
+      } else if (goalDistance < MAX_GOAL_DISTANCE) {
         const updatedUser = await userService.update(userId, {
           currentGoal: goalDistance + 1,
         });
