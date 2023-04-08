@@ -5,19 +5,25 @@ import httpMultipartBodyParser from '@middy/http-multipart-body-parser';
 import sharp from 'sharp';
 import { parseRundayImage } from '@libs/parse-runday-image';
 import { createWorker } from 'tesseract.js';
+import { Handler } from 'aws-lambda';
 
-const analyzeCaptureImage = async (event) => {
+const analyzeCaptureImage: Handler<{
+  body: {
+    image: {
+      filename: string;
+      mimetype: string;
+      encoding: string;
+      truncated: boolean;
+      content: string;
+    };
+  };
+}> = async (event) => {
   try {
-    console.log(event);
-    console.log(event.body);
-
     console.log(Buffer.from(event.body.image.content).toString('base64'));
 
     const resizedImage = await sharp(event.body.image.content)
       .resize({ width: 648 })
       .toBuffer();
-
-    console.log(resizedImage);
 
     const worker = await createWorker();
     const parsedData = await parseRundayImage(worker, resizedImage);
