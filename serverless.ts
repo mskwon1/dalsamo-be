@@ -130,6 +130,7 @@ const serverlessConfiguration: AWS = {
         'npm install tesseract.js',
       ],
     },
+    dalsamoOrigin: '${env:DALSAMO_WEB_ORIGIN}',
     resourcePolicy: {
       dev: [
         {

@@ -15,8 +15,8 @@ const login: LambdaFunctionEntry = {
           },
         },
         cors: {
-          origin: '${env:DALSAMO_WEB_ORIGIN}',
-          methods: ['POST'],
+          origin: '${self:custom.dalsamoOrigin}',
+          methods: ['POST', 'OPTIONS'],
           allowCredentials: true,
         },
       },
