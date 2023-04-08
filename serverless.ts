@@ -21,7 +21,7 @@ const serverlessConfiguration: AWS = {
       resourcePolicy: [
         {
           Effect: 'Allow',
-          Pricinpal: '*',
+          Principal: '*',
           Action: 'execute-api:Invoke',
           Resource: 'excute-api:/*/*/*',
         },
