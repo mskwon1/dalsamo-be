@@ -1,4 +1,4 @@
-import type { AWS } from '@serverless/typescript';
+import type { AWS, AwsResourcePolicyStatements } from '@serverless/typescript';
 
 import functions from '@functions/index';
 
@@ -18,25 +18,8 @@ const serverlessConfiguration: AWS = {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
       binaryMediaTypes: ['multipart/form-data', 'image/png', 'image/jpeg'],
-      resourcePolicy: [
-        {
-          Effect: 'Allow',
-          Principal: '*',
-          Action: 'execute-api:Invoke',
-          Resource: 'execute-api:/*/*/*',
-        },
-        {
-          Effect: 'Deny',
-          Principal: '*',
-          Action: 'execute-api:Invoke',
-          Resource: 'execute-api:/*/*/*',
-          Condition: {
-            StringLike: {
-              'aws:UserAgent': ['*Postman*', '*Curl*'],
-            },
-          },
-        },
-      ],
+      resourcePolicy:
+        '${self:custom.resourcePolicy.${self.provider.stage}}' as unknown as AwsResourcePolicyStatements,
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
@@ -145,6 +128,35 @@ const serverlessConfiguration: AWS = {
       packagerOptions: [
         'npm install --arch=x64 --platform=linux sharp',
         'npm install tesseract.js',
+      ],
+    },
+    resourcePolicy: {
+      dev: [
+        {
+          Effect: 'Allow',
+          Principal: '*',
+          Action: 'execute-api:Invoke',
+          Resource: 'execute-api:/*/*/*',
+        },
+        {
+          Effect: 'Deny',
+          Principal: '*',
+          Action: 'execute-api:Invoke',
+          Resource: 'execute-api:/*/*/*',
+          Condition: {
+            StringLike: {
+              'aws:UserAgent': ['*Postman*', '*Curl*'],
+            },
+          },
+        },
+      ],
+      prod: [
+        {
+          Effect: 'Allow',
+          Principal: '*',
+          Action: 'execute-api:Invoke',
+          Resource: 'execute-api:/*/*/*',
+        },
       ],
     },
   },
