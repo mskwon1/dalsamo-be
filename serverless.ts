@@ -27,18 +27,9 @@ const serverlessConfiguration: AWS = {
     },
     iamRoleStatements: [
       {
-        Version: '2012-10-17',
-        Statement: [
-          {
-            Sid: 'AllowDalsamoCdnS3Access',
-            Effect: 'Allow',
-            Action: ['s3:*'],
-            Resource: [
-              'arn:aws:s3:::dalsamo-cdn/*',
-              'arn:aws:s3:::dalsamo-cdn',
-            ],
-          },
-        ],
+        Effect: 'Allow',
+        Action: ['s3:*'],
+        Resource: ['arn:aws:s3:::dalsamo-cdn/*', 'arn:aws:s3:::dalsamo-cdn'],
       },
     ],
   },
