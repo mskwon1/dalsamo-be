@@ -12,6 +12,7 @@ import * as _ from 'lodash';
 import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
 import RunEntryService from './runEntryService';
 import { generateKSUID } from 'src/utils';
+import { report } from 'process';
 
 type CreateWeeklyReportParams = {
   startDate: string;
@@ -114,12 +115,18 @@ class WeeklyReportService {
         PK: { S: `weeklyReport#${weeklyReportId}` },
         SK: { S: `weeklyReport#${weeklyReportId}` },
       },
-      UpdateExpression: 'SET #S = :st, reportImageUrl = :ri',
+      UpdateExpression: reportImageUrl
+        ? 'SET #S = :st, reportImageUrl = :ri'
+        : 'SET #S = :st',
       ExpressionAttributeNames: { '#S': 'status' },
-      ExpressionAttributeValues: {
-        ':st': { S: status },
-        ':ri': reportImageUrl ? { S: reportImageUrl } : undefined,
-      },
+      ExpressionAttributeValues: reportImageUrl
+        ? {
+            ':st': { S: status },
+            ':ri': { S: reportImageUrl },
+          }
+        : {
+            ':st': { S: status },
+          },
       ReturnValues: ReturnValue.ALL_NEW,
     });
 
@@ -140,14 +147,17 @@ class WeeklyReportService {
     reportImageUrl?: string;
   }): PutRequest {
     return {
-      Item: {
-        PK: { S: `weeklyReport#${weeklyReportId}` },
-        SK: { S: `weeklyReport#${weeklyReportId}` },
-        startDate: { S: startDate },
-        EntityType: { S: 'weeklyReport' },
-        status: { S: status },
-        reportImageUrl: reportImageUrl ? { S: reportImageUrl } : undefined,
-      },
+      Item: _.omitBy(
+        {
+          PK: { S: `weeklyReport#${weeklyReportId}` },
+          SK: { S: `weeklyReport#${weeklyReportId}` },
+          startDate: { S: startDate },
+          EntityType: { S: 'weeklyReport' },
+          status: { S: status },
+          reportImageUrl: reportImageUrl ? { S: reportImageUrl } : undefined,
+        },
+        _.isUndefined
+      ),
     };
   }
 
