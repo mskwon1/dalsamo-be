@@ -13,7 +13,6 @@ import { generateKSUID } from 'src/utils';
 type CreateUserParams = {
   name: string;
   email?: string;
-  rundayTag?: string;
 };
 
 type UpdateUserParams = {
@@ -50,7 +49,7 @@ class UserService {
   }
 
   async create(params: CreateUserParams) {
-    const { name, email, rundayTag } = params;
+    const { name, email } = params;
 
     const userId = this.generateId();
 
@@ -63,7 +62,6 @@ class UserService {
         name: { S: name },
         email: email ? { S: email } : { NULL: true },
         currentGoal: { N: `${DEFAULT_GOAL}` },
-        rundayTag: rundayTag ? { S: rundayTag } : { NULL: true },
       },
     });
 
@@ -101,15 +99,13 @@ class UserService {
       email,
       currentGoal: { N: currentGoal },
       name: { S: name },
-      rundayTag,
     } = userDocument;
 
     return {
       id: _.split(id, '#')[1],
-      email: email?.S ? email.S : null,
       currentGoal: _.toNumber(currentGoal),
       name,
-      rundayTag: rundayTag?.S ? rundayTag.S : null,
+      email: email?.S ? email.S : null,
     };
   }
 }

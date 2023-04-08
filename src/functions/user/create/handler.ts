@@ -11,12 +11,12 @@ const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 const createUser: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   event
 ) => {
-  const { name, email, rundayTag } = event.body;
+  const { name, email } = event.body;
 
   const userService = new UserService(client);
 
   try {
-    const userId = await userService.create({ name, email, rundayTag });
+    const userId = await userService.create({ name, email });
 
     return formatJSONResponse({ message: `user created - ${userId}`, event });
   } catch (error) {
