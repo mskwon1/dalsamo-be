@@ -35,6 +35,11 @@ const closeWeeklyReport: LambdaFunctionEntry = {
         },
       ],
     },
+    {
+      Effect: 'Allow',
+      Action: ['s3:*'],
+      Resource: ['arn:aws:s3:::dalsamo-cdn/*', 'arn:aws:s3:::dalsamo-cdn'],
+    },
   ],
 };
 
