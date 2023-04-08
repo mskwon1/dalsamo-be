@@ -30,6 +30,8 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   try {
     let reportImageUrl: string;
     if (base64Image) {
+      console.log(base64Image);
+
       const imageBuffer = Buffer.from(base64Image, 'base64');
 
       const processedImage = await sharp(imageBuffer)
