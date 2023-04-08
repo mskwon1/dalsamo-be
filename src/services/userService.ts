@@ -48,6 +48,29 @@ class UserService {
     return _.map(users, UserService.parseUserDocument);
   }
 
+  async findOneByEmail(email: string): Promise<UserEntity | null> {
+    const readUsersCommand = new QueryCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      IndexName: DBIndexName.ET_PK,
+      KeyConditionExpression: 'EntityType = :pk_val',
+      FilterExpression: 'email = :em',
+      ExpressionAttributeValues: {
+        ':pk_val': { S: 'user' },
+        em: { S: email },
+      },
+    });
+
+    const { Items: users } = await this.client.send(readUsersCommand);
+
+    const targetUser = _.head(users);
+
+    if (!targetUser) {
+      return null;
+    }
+
+    return UserService.parseUserDocument(targetUser);
+  }
+
   async create(params: CreateUserParams) {
     const { name, email } = params;
 
