@@ -6,6 +6,8 @@ import UserService from 'src/services/userService';
 import schema from './schema';
 import { OAuth2Client } from 'google-auth-library';
 import { formatErrorResponse } from '@libs/api-gateway';
+import signDalsamoJwt from '@libs/sign-dalsamo-jwt';
+import { DALSAMO_WEB_DOMAIN } from 'src/constants';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 const googleClient = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
@@ -40,7 +42,14 @@ const loginHandler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
       });
     }
 
-    return formatJSONResponse({ message: `user login`, user, success: true });
+    const token = signDalsamoJwt(user);
+
+    return formatJSONResponse(
+      { message: `user login`, user, success: true },
+      {
+        'Set-Cookie': `auth-token=${token}; Domain=${DALSAMO_WEB_DOMAIN}; Secure; HttpOnly`,
+      }
+    );
   } catch (error) {
     console.log(error);
     return formatErrorResponse(500, {

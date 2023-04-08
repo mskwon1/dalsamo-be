@@ -20,6 +20,12 @@ jobs:
         run: echo ${{ github.ref }}
       - name: Echo var stage
         run: echo ${{ vars.STAGE }}
+
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
       - name: Checkout
         uses: actions/checkout@v3
 
