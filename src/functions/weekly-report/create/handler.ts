@@ -41,7 +41,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
     return formatJSONResponse({
       message: `weekly report created - ${weeklyReportId}`,
-      event,
+      createdId: weeklyReportId,
     });
   } catch (error) {
     console.log(error);
