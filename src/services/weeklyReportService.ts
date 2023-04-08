@@ -13,6 +13,7 @@ import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
 import RunEntryService from './runEntryService';
 import { generateKSUID } from 'src/utils';
 import { report } from 'process';
+import FineService from './fineService';
 
 type CreateWeeklyReportParams = {
   startDate: string;
@@ -57,6 +58,11 @@ class WeeklyReportService {
       return null;
     }
 
+    const fines = _.chain(Items)
+      .filter((item) => item.EntityType?.S === 'fine')
+      .map(FineService.parseFineDocument)
+      .value();
+
     const runEntries = _.chain(Items)
       .filter((item) => item.EntityType?.S === 'runEntry')
       .map(RunEntryService.parseRunEntryDocument)
@@ -65,6 +71,7 @@ class WeeklyReportService {
     return {
       ...WeeklyReportService.parseWeeklyReportDocument(weeklyReport),
       runEntries,
+      fines,
     };
   }
 

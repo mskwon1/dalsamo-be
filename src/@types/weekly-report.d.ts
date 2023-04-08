@@ -15,4 +15,5 @@ type WeeklyReportEntity = {
 
 type ComposedWeeklyReportEntity = WeeklyReportEntity & {
   runEntries: RunEntryEntity[];
+  fines: FineEntity[];
 };
