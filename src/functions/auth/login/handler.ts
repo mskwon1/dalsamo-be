@@ -47,7 +47,7 @@ const loginHandler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
     return formatJSONResponse(
       { message: `user login`, user, success: true },
       {
-        'Set-Cookie': `auth-token=${token}; Domain=${process.env.DALSAMO_WEB_ORIGIN}; Secure; HttpOnly`,
+        'Set-Cookie': `auth-token=${token}; Domain=${process.env.DALSAMO_WEB_DOMAIN}; Secure; HttpOnly`,
       }
     );
   } catch (error) {
