@@ -12,7 +12,6 @@ import * as _ from 'lodash';
 import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
 import RunEntryService from './runEntryService';
 import { generateKSUID } from 'src/utils';
-import { report } from 'process';
 import FineService from './fineService';
 
 type CreateWeeklyReportParams = {
