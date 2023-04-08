@@ -10,6 +10,7 @@ import UserService from 'src/services/userService';
 import WeeklyReportService from 'src/services/weeklyReportService';
 import { MAX_GOAL_DISTANCE } from 'src/constants';
 import uploadFileToDalsamoCdn from '@libs/upload-dalsamo-cdn';
+import sharp from 'sharp';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
@@ -31,9 +32,14 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
     if (base64Image) {
       const imageBuffer = Buffer.from(base64Image, 'base64');
 
+      const processedImage = await sharp(imageBuffer)
+        .resize({ width: 1000, withoutEnlargement: true })
+        .webp()
+        .toBuffer();
+
       reportImageUrl = await uploadFileToDalsamoCdn({
-        file: imageBuffer,
-        path: `${weeklyReportId}`,
+        file: processedImage,
+        path: `weekly-reports/${weeklyReportId}/${new Date().valueOf()}.webp`,
       });
     }
 
