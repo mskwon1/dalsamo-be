@@ -20,6 +20,7 @@ type CreateWeeklyReportParams = {
 
 type UpdateWeeklyReportParams = {
   status: 'pending' | 'confirmed';
+  reportImageUrl?: string;
 };
 
 class WeeklyReportService {
@@ -105,7 +106,7 @@ class WeeklyReportService {
     weeklyReportId: string,
     params: UpdateWeeklyReportParams
   ): Promise<WeeklyReportEntity> {
-    const { status } = params;
+    const { status, reportImageUrl } = params;
 
     const updateCommand = new UpdateItemCommand({
       TableName: DALSAMO_SINGLE_TABLE,
@@ -113,10 +114,11 @@ class WeeklyReportService {
         PK: { S: `weeklyReport#${weeklyReportId}` },
         SK: { S: `weeklyReport#${weeklyReportId}` },
       },
-      UpdateExpression: 'SET #S = :st',
+      UpdateExpression: 'SET #S = :st, reportImageUrl = :ri',
       ExpressionAttributeNames: { '#S': 'status' },
       ExpressionAttributeValues: {
         ':st': { S: status },
+        ':ri': reportImageUrl ? { S: reportImageUrl } : undefined,
       },
       ReturnValues: ReturnValue.ALL_NEW,
     });
@@ -130,17 +132,21 @@ class WeeklyReportService {
     weeklyReportId,
     startDate,
     status,
+    reportImageUrl,
   }: {
     weeklyReportId: string;
     startDate: string;
     status: 'pending' | 'confirmed';
+    reportImageUrl?: string;
   }): PutRequest {
     return {
       Item: {
         PK: { S: `weeklyReport#${weeklyReportId}` },
-        SK: { S: startDate },
+        SK: { S: `weeklyReport#${weeklyReportId}` },
+        startDate: { S: startDate },
         EntityType: { S: 'weeklyReport' },
         status: { S: status },
+        reportImageUrl: reportImageUrl ? { S: reportImageUrl } : undefined,
       },
     };
   }
@@ -150,14 +156,16 @@ class WeeklyReportService {
   ): WeeklyReportEntity {
     const {
       PK: { S: id },
-      SK: { S: startDate },
+      startDate: { S: startDate },
       status: { S: status },
+      reportImageUrl,
     } = weeklyReportDocument;
 
     return {
       id: _.split(id, '#')[1],
       startDate,
       status,
+      reportImageUrl: reportImageUrl ? reportImageUrl.S : null,
     } as WeeklyReportEntity;
   }
 }

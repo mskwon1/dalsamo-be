@@ -9,6 +9,7 @@ import FineService from 'src/services/fineService';
 import UserService from 'src/services/userService';
 import WeeklyReportService from 'src/services/weeklyReportService';
 import { MAX_GOAL_DISTANCE } from 'src/constants';
+import uploadFileToDalsamoCdn from '@libs/upload-dalsamo-cdn';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
@@ -18,7 +19,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   const {
     pathParameters: { weeklyReportId },
   } = event;
-  const { runEntries } = event.body;
+  const { runEntries, base64Image } = event.body;
 
   const runEntryService = new RunEntryService(client);
   const weeklyReportService = new WeeklyReportService(client);
@@ -26,6 +27,25 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   const userService = new UserService(client);
 
   try {
+    let reportImageUrl: string;
+    if (base64Image) {
+      const imageBuffer = Buffer.from(base64Image, 'base64');
+
+      reportImageUrl = await uploadFileToDalsamoCdn({
+        file: imageBuffer,
+        path: `${weeklyReportId}`,
+      });
+    }
+
+    console.log(reportImageUrl);
+
+    const updatedWeeklyReport = await weeklyReportService.update(
+      weeklyReportId,
+      { status: 'confirmed', reportImageUrl }
+    );
+
+    console.log(updatedWeeklyReport);
+
     const fineTargets = [];
 
     for (const entry of runEntries) {
@@ -64,13 +84,6 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
       console.log({ createdCount });
     }
-
-    const updatedWeeklyReport = await weeklyReportService.update(
-      weeklyReportId,
-      { status: 'confirmed' }
-    );
-
-    console.log(updatedWeeklyReport);
 
     return formatJSONResponse({
       message: `weekly report closed - ${weeklyReportId}`,

@@ -15,6 +15,7 @@ const schema = {
         required: ['id', 'runDistance', 'goalDistance', 'userId', 'userName'],
       },
     },
+    base64Image: { type: 'string' },
   },
   required: ['runEntries'],
 } as const;
