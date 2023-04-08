@@ -2,13 +2,13 @@ import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
-const createWeeklyReport: LambdaFunctionEntry = {
+const openWeeklyReport: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
       http: {
         method: 'post',
-        path: 'weekly-reports',
+        path: 'weekly-reports/open',
         request: {
           schemas: {
             'application/json': schema,
@@ -35,4 +35,4 @@ const createWeeklyReport: LambdaFunctionEntry = {
   ],
 };
 
-export default createWeeklyReport;
+export default openWeeklyReport;

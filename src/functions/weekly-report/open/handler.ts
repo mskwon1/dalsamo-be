@@ -5,7 +5,7 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import schema from './schema';
 import WeeklyReportService from 'src/services/weeklyReportService';
 import RunEntryService from 'src/services/runEntryService';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
