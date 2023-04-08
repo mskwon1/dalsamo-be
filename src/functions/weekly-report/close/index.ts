@@ -1,16 +1,20 @@
+import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
-const findAllUsers: LambdaFunctionEntry = {
+const closeWeeklyReport: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
       http: {
-        method: 'get',
-        path: 'users',
+        method: 'post',
+        path: 'weekly-reports/{weeklyReportId}/close',
         request: {
           parameters: {
-            querystrings: { limit: false },
+            paths: { weeklyReportId: true },
+          },
+          schemas: {
+            'application/json': schema,
           },
         },
         cors: true,
@@ -20,7 +24,7 @@ const findAllUsers: LambdaFunctionEntry = {
   iamRoleStatements: [
     {
       Effect: 'Allow',
-      Action: ['dynamodb:Query'],
+      Action: ['dynamodb:BatchWriteItem', 'dynamodb:UpdateItem'],
       Resource: [
         { 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] },
         {
@@ -31,7 +35,12 @@ const findAllUsers: LambdaFunctionEntry = {
         },
       ],
     },
+    {
+      Effect: 'Allow',
+      Action: ['s3:*'],
+      Resource: ['arn:aws:s3:::dalsamo-cdn/*', 'arn:aws:s3:::dalsamo-cdn'],
+    },
   ],
 };
 
-export default findAllUsers;
+export default closeWeeklyReport;

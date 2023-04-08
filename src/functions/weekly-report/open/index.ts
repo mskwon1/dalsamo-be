@@ -1,16 +1,17 @@
+import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
-const findAllUsers: LambdaFunctionEntry = {
+const openWeeklyReport: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
       http: {
-        method: 'get',
-        path: 'users',
+        method: 'post',
+        path: 'weekly-reports/open',
         request: {
-          parameters: {
-            querystrings: { limit: false },
+          schemas: {
+            'application/json': schema,
           },
         },
         cors: true,
@@ -20,7 +21,7 @@ const findAllUsers: LambdaFunctionEntry = {
   iamRoleStatements: [
     {
       Effect: 'Allow',
-      Action: ['dynamodb:Query'],
+      Action: ['dynamodb:PutItem', 'dynamodb:BatchWriteItem'],
       Resource: [
         { 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] },
         {
@@ -34,4 +35,4 @@ const findAllUsers: LambdaFunctionEntry = {
   ],
 };
 
-export default findAllUsers;
+export default openWeeklyReport;

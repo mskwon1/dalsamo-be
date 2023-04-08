@@ -3,14 +3,20 @@ import {
   DynamoDBClient,
   PutItemCommand,
   QueryCommand,
+  ReturnValue,
+  UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
 import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
-import { v1 as uuidV1 } from 'uuid';
+import { generateKSUID } from 'src/utils';
 
 type CreateUserParams = {
   name: string;
   email?: string;
+};
+
+type UpdateUserParams = {
+  currentGoal: number;
 };
 
 const DEFAULT_GOAL = 7;
@@ -23,14 +29,14 @@ class UserService {
   }
 
   private generateId() {
-    return uuidV1();
+    return generateKSUID();
   }
 
   async findAll(params: { limit?: number }): Promise<UserEntity[]> {
     const { limit = 10 } = params;
 
     const readUsersCommand = new QueryCommand({
-      TableName: `${process.env.STAGE}-dalsamo-single-table`,
+      TableName: DALSAMO_SINGLE_TABLE,
       Limit: limit,
       IndexName: DBIndexName.ET_PK,
       KeyConditionExpression: 'EntityType = :pk_val',
@@ -39,7 +45,7 @@ class UserService {
 
     const { Items: users } = await this.client.send(readUsersCommand);
 
-    return _.map(users, this.parseUserDocument);
+    return _.map(users, UserService.parseUserDocument);
   }
 
   async create(params: CreateUserParams) {
@@ -64,7 +70,30 @@ class UserService {
     return userId;
   }
 
-  parseUserDocument(userDocument: Record<string, AttributeValue>): UserEntity {
+  async update(userId: string, params: UpdateUserParams) {
+    const { currentGoal } = params;
+
+    const command = new UpdateItemCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      Key: {
+        PK: { S: `user#${userId}` },
+        SK: { S: `user#${userId}` },
+      },
+      UpdateExpression: 'SET currentGoal = :cg',
+      ExpressionAttributeValues: {
+        ':cg': { N: `${currentGoal}` },
+      },
+      ReturnValues: ReturnValue.ALL_NEW,
+    });
+
+    const { Attributes } = await this.client.send(command);
+
+    return UserService.parseUserDocument(Attributes);
+  }
+
+  static parseUserDocument(
+    userDocument: Record<string, AttributeValue>
+  ): UserEntity {
     const {
       PK: { S: id },
       email,
@@ -74,9 +103,9 @@ class UserService {
 
     return {
       id: _.split(id, '#')[1],
-      email: email?.S ? email.S : null,
       currentGoal: _.toNumber(currentGoal),
       name,
+      email: email?.S ? email.S : null,
     };
   }
 }

@@ -14,6 +14,7 @@ const createUser: LambdaFunctionEntry = {
             'application/json': schema,
           },
         },
+        cors: true,
       },
     },
   ],

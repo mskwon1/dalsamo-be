@@ -1,0 +1,6 @@
+{
+  "headers": {
+    "Content-Type": "multipart/form-data"
+  },
+  "body": "{\"name\": \"Frederic\", \"email\": \"user@example.com\"}"
+}

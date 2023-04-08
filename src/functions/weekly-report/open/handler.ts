@@ -5,7 +5,7 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import schema from './schema';
 import WeeklyReportService from 'src/services/weeklyReportService';
 import RunEntryService from 'src/services/runEntryService';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
@@ -25,12 +25,13 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
     const { createdItemsCount } = await runEntryService.createMany(
       _.map(runEntries, (rawEntry) => {
-        const { userId, goalDistance } = rawEntry;
+        const { userId, goalDistance, userName } = rawEntry;
 
         return {
           weeklyReportId,
           runDistance: 0,
           userId,
+          userName,
           goalDistance,
         };
       })
@@ -40,7 +41,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
     return formatJSONResponse({
       message: `weekly report created - ${weeklyReportId}`,
-      event,
+      createdId: weeklyReportId,
     });
   } catch (error) {
     console.log(error);

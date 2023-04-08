@@ -1,16 +1,16 @@
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
-const findAllUsers: LambdaFunctionEntry = {
+const findAllWeeklyReports: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
       http: {
         method: 'get',
-        path: 'users',
+        path: 'weekly-reports',
         request: {
           parameters: {
-            querystrings: { limit: false },
+            querystrings: { lastEvaluatedKey: false, limit: false },
           },
         },
         cors: true,
@@ -34,4 +34,4 @@ const findAllUsers: LambdaFunctionEntry = {
   ],
 };
 
-export default findAllUsers;
+export default findAllWeeklyReports;
