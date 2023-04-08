@@ -7,7 +7,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
 import { DALSAMO_SINGLE_TABLE } from 'src/constants';
-import { v1 as uuidV1 } from 'uuid';
+import { generateKSUID } from 'src/utils';
 
 type CreateFineParams = {
   weeklyReportId: string;
@@ -63,12 +63,12 @@ class FineService {
     userName: string;
     value: number;
   }): PutRequest {
-    const id = fineId || uuidV1();
+    const id = fineId || generateKSUID();
 
     return {
       Item: {
-        PK: { S: `fine#${id}` },
-        SK: { S: `weeklyReport#${weeklyReportId}` },
+        PK: { S: `weeklyReport#${weeklyReportId}` },
+        SK: { S: `fine#${id}` },
         EntityType: { S: 'fine' },
         value: { N: `${value}` },
         GSI: { S: `user#${userId}` },
@@ -81,8 +81,8 @@ class FineService {
     fineDocument: Record<string, AttributeValue>
   ): FineEntity {
     const {
-      PK: { S: id },
-      SK: { S: weeklyReportId },
+      PK: { S: weeklyReportId },
+      SK: { S: id },
       GSI: { S: userId },
       userName: { S: userName },
       value: { N: value },

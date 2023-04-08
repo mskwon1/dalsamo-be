@@ -8,7 +8,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
 import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
-import { v1 as uuidV1 } from 'uuid';
+import { generateKSUID } from 'src/utils';
 
 type CreateUserParams = {
   name: string;
@@ -30,7 +30,7 @@ class UserService {
   }
 
   private generateId() {
-    return uuidV1();
+    return generateKSUID();
   }
 
   async findAll(params: { limit?: number }): Promise<UserEntity[]> {

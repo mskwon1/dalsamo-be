@@ -9,7 +9,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
 import { DALSAMO_SINGLE_TABLE } from 'src/constants';
-import { v1 as uuidV1 } from 'uuid';
+import { generateKSUID } from 'src/utils';
 
 type CreateRunEntryParams = {
   weeklyReportId: string;
@@ -95,7 +95,7 @@ class RunEntryService {
     runDistance: number;
     goalDistance: number;
   }): PutRequest {
-    const id = runEntryId || uuidV1();
+    const id = runEntryId || generateKSUID();
 
     return {
       Item: {
