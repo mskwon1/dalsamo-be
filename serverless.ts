@@ -20,9 +20,15 @@ const serverlessConfiguration: AWS = {
       binaryMediaTypes: ['multipart/form-data', 'image/png', 'image/jpeg'],
       resourcePolicy: [
         {
+          Effect: 'Allow',
+          Pricinpal: '*',
+          Action: 'execute-api:Invoke',
+          Resource: 'excute-api:/*/*/*',
+        },
+        {
           Effect: 'Deny',
           Principal: '*',
-          Action: 'excute-api:Invoke',
+          Action: 'execute-api:Invoke',
           Resource: 'execute-api:/*/*/*',
           Condition: {
             StringLike: {
