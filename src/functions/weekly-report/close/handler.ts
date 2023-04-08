@@ -32,7 +32,10 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
     if (base64Image) {
       console.log(base64Image);
 
-      const imageBuffer = Buffer.from(base64Image, 'base64');
+      const imageBuffer = Buffer.from(
+        base64Image.split(';base64,').pop(),
+        'base64'
+      );
 
       const processedImage = await sharp(imageBuffer)
         .resize({ width: 1000, withoutEnlargement: true })
