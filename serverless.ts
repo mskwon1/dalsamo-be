@@ -145,6 +145,14 @@ const serverlessConfiguration: AWS = {
           Action: 'execute-api:Invoke',
           Resource: 'execute-api:/*/*/*',
         },
+      ],
+      prod: [
+        {
+          Effect: 'Allow',
+          Principal: '*',
+          Action: 'execute-api:Invoke',
+          Resource: 'execute-api:/*/*/*',
+        },
         {
           Effect: 'Deny',
           Principal: '*',
@@ -155,14 +163,6 @@ const serverlessConfiguration: AWS = {
               'aws:UserAgent': ['*Postman*', '*Curl*'],
             },
           },
-        },
-      ],
-      prod: [
-        {
-          Effect: 'Allow',
-          Principal: '*',
-          Action: 'execute-api:Invoke',
-          Resource: 'execute-api:/*/*/*',
         },
       ],
     },
