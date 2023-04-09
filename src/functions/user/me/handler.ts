@@ -3,10 +3,9 @@ import { middyfy } from '@libs/lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import UserService from 'src/services/userService';
 import { formatErrorResponse } from '@libs/api-gateway';
-import { APIGatewayProxyHandler, Handler } from 'aws-lambda';
+import { Handler } from 'aws-lambda';
 import httpHeaderNormalizer from '@middy/http-header-normalizer';
 import _ from 'lodash';
-import verifyDalsamoJwt from '@libs/verify-dalsamo-jwt';
 import verifyJwtMiddleware from 'src/middlewares/verifyJwtMiddleware';
 import { JWTPayload } from 'jose';
 

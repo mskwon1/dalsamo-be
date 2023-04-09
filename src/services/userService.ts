@@ -138,6 +138,7 @@ class UserService {
       email,
       currentGoal: { N: currentGoal },
       name: { S: name },
+      roles,
     } = userDocument;
 
     return {
@@ -145,6 +146,7 @@ class UserService {
       currentGoal: _.toNumber(currentGoal),
       name,
       email: email?.S ? email.S : null,
+      roles: roles ? roles.SS : [],
     };
   }
 }
