@@ -75,7 +75,7 @@ class UserService {
   async findOneById(id: string): Promise<UserEntity | null> {
     const getUserItemCommand = new GetItemCommand({
       TableName: DALSAMO_SINGLE_TABLE,
-      Key: { PK: { S: id } },
+      Key: { PK: { S: `user#${id}` }, SK: { S: `user#${id}` } },
     });
 
     const { Item } = await this.client.send(getUserItemCommand);
