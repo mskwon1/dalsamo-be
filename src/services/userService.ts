@@ -1,6 +1,7 @@
 import {
   AttributeValue,
   DynamoDBClient,
+  GetItemCommand,
   PutItemCommand,
   QueryCommand,
   ReturnValue,
@@ -69,6 +70,21 @@ class UserService {
     }
 
     return UserService.parseUserDocument(targetUser);
+  }
+
+  async findOneById(id: string): Promise<UserEntity | null> {
+    const getUserItemCommand = new GetItemCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      Key: { PK: { S: id } },
+    });
+
+    const { Item } = await this.client.send(getUserItemCommand);
+
+    if (!Item) {
+      return null;
+    }
+
+    return UserService.parseUserDocument(Item);
   }
 
   async create(params: CreateUserParams) {
