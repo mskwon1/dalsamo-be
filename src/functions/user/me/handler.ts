@@ -3,35 +3,25 @@ import { middyfy } from '@libs/lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import UserService from 'src/services/userService';
 import { formatErrorResponse } from '@libs/api-gateway';
-import { APIGatewayProxyHandler } from 'aws-lambda';
+import { APIGatewayProxyHandler, Handler } from 'aws-lambda';
 import httpHeaderNormalizer from '@middy/http-header-normalizer';
 import _ from 'lodash';
 import verifyDalsamoJwt from '@libs/verify-dalsamo-jwt';
+import verifyJwtMiddleware from 'src/middlewares/verifyJwtMiddleware';
+import { JWTPayload } from 'jose';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
-const getMeHandler: APIGatewayProxyHandler = async (event) => {
+const getMeHandler: Handler<{
+  auth: { payload: JWTPayload; token: string };
+}> = async (event) => {
   try {
-    const { headers } = event;
+    const { payload, token } = event.auth;
 
-    console.log(headers);
-    const { authorization } = headers;
-    console.log(authorization);
-
-    const token = _.split(authorization, ' ')[1];
-    console.log(token);
-
-    const jwtPayload = await verifyDalsamoJwt(token);
-    console.log(jwtPayload);
-
-    if (!jwtPayload) {
-      return formatErrorResponse(401, {
-        message: 'token verify failed',
-      });
-    }
+    console.log(event.auth);
 
     const userService = new UserService(client);
-    const user = await userService.findOneById(jwtPayload.id as string);
+    const user = await userService.findOneById(payload.id as string);
 
     console.log(user);
 
@@ -54,4 +44,6 @@ const getMeHandler: APIGatewayProxyHandler = async (event) => {
   }
 };
 
-export const main = middyfy(getMeHandler).use(httpHeaderNormalizer());
+export const main = middyfy(getMeHandler)
+  .use(httpHeaderNormalizer())
+  .use(verifyJwtMiddleware({ passthrough: false }));
