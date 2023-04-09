@@ -1,6 +1,7 @@
 import {
   AttributeValue,
   DynamoDBClient,
+  GetItemCommand,
   PutItemCommand,
   QueryCommand,
   ReturnValue,
@@ -46,6 +47,44 @@ class UserService {
     const { Items: users } = await this.client.send(readUsersCommand);
 
     return _.map(users, UserService.parseUserDocument);
+  }
+
+  async findOneByEmail(email: string): Promise<UserEntity | null> {
+    const readUsersCommand = new QueryCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      IndexName: DBIndexName.ET_PK,
+      KeyConditionExpression: 'EntityType = :pk_val',
+      FilterExpression: 'email = :em',
+      ExpressionAttributeValues: {
+        ':pk_val': { S: 'user' },
+        ':em': { S: email },
+      },
+    });
+
+    const { Items: users } = await this.client.send(readUsersCommand);
+
+    const targetUser = _.head(users);
+
+    if (!targetUser) {
+      return null;
+    }
+
+    return UserService.parseUserDocument(targetUser);
+  }
+
+  async findOneById(id: string): Promise<UserEntity | null> {
+    const getUserItemCommand = new GetItemCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      Key: { PK: { S: `user#${id}` }, SK: { S: `user#${id}` } },
+    });
+
+    const { Item } = await this.client.send(getUserItemCommand);
+
+    if (!Item) {
+      return null;
+    }
+
+    return UserService.parseUserDocument(Item);
   }
 
   async create(params: CreateUserParams) {
@@ -99,6 +138,7 @@ class UserService {
       email,
       currentGoal: { N: currentGoal },
       name: { S: name },
+      roles,
     } = userDocument;
 
     return {
@@ -106,6 +146,7 @@ class UserService {
       currentGoal: _.toNumber(currentGoal),
       name,
       email: email?.S ? email.S : null,
+      roles: roles ? roles.SS : [],
     };
   }
 }

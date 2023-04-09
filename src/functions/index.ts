@@ -5,6 +5,8 @@ import findAllWeeklyReports from './weekly-report/findAll';
 import openWeeklyReport from './weekly-report/open';
 import closeWeeklyReport from './weekly-report/close';
 import analyzeCaptureImage from './utils/analyze-capture-image';
+import login from './auth/login';
+import getMe from './user/me';
 
 const functions = {
   findAllUsers,
@@ -14,6 +16,8 @@ const functions = {
   openWeeklyReport,
   closeWeeklyReport,
   analyzeCaptureImage,
+  login,
+  getMe,
 };
 
 export default functions;
