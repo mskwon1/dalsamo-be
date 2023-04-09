@@ -20,8 +20,7 @@ export const formatJSONResponse = (
   return {
     statusCode: 200,
     headers: {
-      'Access-Control-Allow-Origin': process.env.DALSAMO_WEB_ORIGIN,
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+      'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': true,
       ...headers,
     },
@@ -36,7 +35,7 @@ export const formatErrorResponse = (
   return {
     statusCode,
     headers: {
-      'Access-Control-Allow-Origin': process.env.DALSAMO_WEB_ORIGIN,
+      'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': true,
     },
     body: JSON.stringify(response),

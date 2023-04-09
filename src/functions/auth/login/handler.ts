@@ -14,6 +14,8 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_OAUTH_CLIENT_ID);
 const loginHandler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   event
 ) => {
+  console.log(event.body);
+
   const { credential } = event.body;
 
   console.log(credential);
@@ -43,12 +45,12 @@ const loginHandler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 
     const token = await signDalsamoJwt(user);
 
-    return formatJSONResponse(
-      { message: `user login`, user, success: true },
-      {
-        'Set-Cookie': `auth-token=${token}; Domain=${process.env.DALSAMO_WEB_DOMAIN}; HttpOnly; Expires=Fri, 31 Dec 9999 23:59:59 GMT`,
-      }
-    );
+    return formatJSONResponse({
+      message: `user login`,
+      user,
+      token,
+      success: true,
+    });
   } catch (error) {
     console.log(error);
     return formatErrorResponse(500, {

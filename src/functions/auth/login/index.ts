@@ -14,11 +14,7 @@ const login: LambdaFunctionEntry = {
             'application/json': schema,
           },
         },
-        cors: {
-          origin: 'https://localhost:3000',
-          methods: ['POST', 'OPTIONS'],
-          allowCredentials: true,
-        },
+        cors: true,
       },
     },
   ],
