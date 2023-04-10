@@ -5,7 +5,6 @@ import UserService from 'src/services/userService';
 import { formatErrorResponse } from '@libs/api-gateway';
 import { Handler } from 'aws-lambda';
 import httpHeaderNormalizer from '@middy/http-header-normalizer';
-import _ from 'lodash';
 import verifyJwtMiddleware from 'src/middlewares/verifyJwtMiddleware';
 import { JWTPayload } from 'jose';
 
@@ -15,7 +14,7 @@ const getMeHandler: Handler<{
   auth: { payload: JWTPayload; token: string };
 }> = async (event) => {
   try {
-    const { payload, token } = event.auth;
+    const { payload } = event.auth;
 
     console.log(event.auth);
 
