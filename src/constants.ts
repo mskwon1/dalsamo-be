@@ -1,5 +1,6 @@
 export enum DBIndexName {
   ET_PK = 'et_pk',
+  ET_GSI = 'et_gsi',
   GSI_SK = 'gsi_sk',
 }
 
