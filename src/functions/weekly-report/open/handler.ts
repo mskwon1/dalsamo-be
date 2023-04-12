@@ -6,6 +6,9 @@ import schema from './schema';
 import WeeklyReportService from 'src/services/weeklyReportService';
 import RunEntryService from 'src/services/runEntryService';
 import _ from 'lodash';
+import httpHeaderNormalizer from '@middy/http-header-normalizer';
+import verifyJwtMiddleware from 'src/middlewares/verifyJwtMiddleware';
+import verifyAdminMiddleware from 'src/middlewares/verifyAdminMiddleware';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
@@ -53,4 +56,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   }
 };
 
-export const main = middyfy(handler);
+export const main = middyfy(handler)
+  .use(httpHeaderNormalizer())
+  .use(verifyJwtMiddleware({ passthrough: false }))
+  .use(verifyAdminMiddleware);

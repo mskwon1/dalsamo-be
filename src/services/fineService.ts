@@ -2,6 +2,7 @@ import {
   AttributeValue,
   BatchWriteItemCommand,
   DynamoDBClient,
+  PutItemCommand,
   PutRequest,
   ReturnConsumedCapacity,
 } from '@aws-sdk/client-dynamodb';
@@ -23,6 +24,19 @@ class FineService {
 
   constructor(client: DynamoDBClient) {
     this.client = client;
+  }
+
+  async create(params: CreateFineParams): Promise<string> {
+    const fineId = generateKSUID();
+
+    const command = new PutItemCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      ...this.generatePutRequest({ fineId, ...params }),
+    });
+
+    await this.client.send(command);
+
+    return fineId;
   }
 
   async createMany(
