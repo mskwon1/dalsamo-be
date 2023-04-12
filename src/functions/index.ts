@@ -7,6 +7,7 @@ import closeWeeklyReport from './weekly-report/close';
 import analyzeCaptureImage from './utils/analyze-capture-image';
 import login from './auth/login';
 import getMe from './user/me';
+import createFine from './fine/create';
 
 const functions = {
   findAllUsers,
@@ -18,6 +19,7 @@ const functions = {
   analyzeCaptureImage,
   login,
   getMe,
+  createFine,
 };
 
 export default functions;
