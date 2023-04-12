@@ -5,7 +5,6 @@ import {
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-
 import schema from './schema';
 import FineService from 'src/services/fineService';
 import verifyJwtMiddleware from 'src/middlewares/verifyJwtMiddleware';
@@ -28,7 +27,10 @@ const createFine: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
       value,
     });
 
-    return formatJSONResponse({ message: `fine created - ${fineId}` });
+    return formatJSONResponse({
+      message: `fine created - ${fineId}`,
+      createdId: fineId,
+    });
   } catch (error) {
     console.log(error);
     return formatErrorResponse(500, { message: 'fine create failed' });
