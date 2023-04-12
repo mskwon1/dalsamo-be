@@ -21,7 +21,7 @@ const createUser: LambdaFunctionEntry = {
   iamRoleStatements: [
     {
       Effect: 'Allow',
-      Action: ['dynamodb:PutItem'],
+      Action: ['dynamodb:PutItem', 'dynamodb:GetItem'],
       Resource: { 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] },
     },
   ],
