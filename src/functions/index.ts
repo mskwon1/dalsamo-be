@@ -8,6 +8,8 @@ import analyzeCaptureImage from './utils/analyze-capture-image';
 import login from './auth/login';
 import getMe from './user/me';
 import createFine from './fine/create';
+import uploadRunEntryImage from './utils/upload-run-entry-image';
+import updateRunEntry from './weekly-report/update-run-entry';
 
 const functions = {
   findAllUsers,
@@ -20,6 +22,8 @@ const functions = {
   login,
   getMe,
   createFine,
+  uploadRunEntryImage,
+  updateRunEntry,
 };
 
 export default functions;

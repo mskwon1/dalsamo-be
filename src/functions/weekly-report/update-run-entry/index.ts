@@ -2,7 +2,7 @@ import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
-const openWeeklyReport: LambdaFunctionEntry = {
+const updateRunEntry: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
@@ -38,4 +38,4 @@ const openWeeklyReport: LambdaFunctionEntry = {
   ],
 };
 
-export default openWeeklyReport;
+export default updateRunEntry;
