@@ -8,10 +8,10 @@ const updateRunEntry: LambdaFunctionEntry = {
     {
       http: {
         method: 'put',
-        path: 'weekly-reports/{weeklReportId}/run-entries/{runEntryId}',
+        path: 'weekly-reports/{WeeklReportId}/run-entries/{runEntryId}',
         request: {
           parameters: {
-            paths: { weeklyReportId: true, runEntryId: true },
+            paths: { WeeklyReportId: true, runEntryId: true },
           },
           schemas: {
             'application/json': schema,
