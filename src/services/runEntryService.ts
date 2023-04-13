@@ -2,6 +2,7 @@ import {
   AttributeValue,
   BatchWriteItemCommand,
   DynamoDBClient,
+  GetItemCommand,
   PutRequest,
   ReturnConsumedCapacity,
   ReturnValue,
@@ -20,8 +21,9 @@ type CreateRunEntryParams = {
 };
 
 type UpdateRunEntryParams = {
-  runDistance: number;
-  goalDistance: number;
+  runDistance?: number;
+  goalDistance?: number;
+  imageUrls?: string[];
 };
 
 class RunEntryService {
@@ -29,6 +31,29 @@ class RunEntryService {
 
   constructor(client: DynamoDBClient) {
     this.client = client;
+  }
+
+  async findOneByKey(key: {
+    weeklyReportId: string;
+    runEntryId: string;
+  }): Promise<RunEntryEntity | null> {
+    const { weeklyReportId, runEntryId } = key;
+
+    const getRunEntryItemCommand = new GetItemCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      Key: {
+        PK: { S: `weeklyReportId#${weeklyReportId}` },
+        SK: { S: `runEntryId#${runEntryId}` },
+      },
+    });
+
+    const { Item } = await this.client.send(getRunEntryItemCommand);
+
+    if (!Item) {
+      return null;
+    }
+
+    return RunEntryService.parseRunEntryDocument(Item);
   }
 
   async createMany(
@@ -54,12 +79,51 @@ class RunEntryService {
     return { createdItemsCount };
   }
 
+  private buildParitalUpdate(params: UpdateRunEntryParams): {
+    updateExpression: string;
+    expressionAttributeValues: Record<string, AttributeValue>;
+  } {
+    const { runDistance, goalDistance, imageUrls } = params;
+
+    if (_.isEmpty(params)) {
+      return {
+        updateExpression: '',
+        expressionAttributeValues: {},
+      };
+    }
+
+    let updateExpression = 'SET';
+    const expressionAttributeValues: Record<string, AttributeValue> = {};
+
+    if (!_.isNil(runDistance)) {
+      updateExpression += ' runDistance = :rd';
+      expressionAttributeValues[':rd'] = { N: `${runDistance}` };
+    }
+
+    if (!_.isNil(goalDistance)) {
+      updateExpression += ' goalDistance = :gd';
+      expressionAttributeValues[':gd'] = { N: `${goalDistance}` };
+    }
+
+    if (!_.isNil(imageUrls)) {
+      updateExpression += ' imageUrls = :imgs';
+      expressionAttributeValues[':imgs'] = { SS: imageUrls };
+    }
+
+    return {
+      updateExpression,
+      expressionAttributeValues,
+    };
+  }
+
   async update(
     key: { runEntryId: string; weeklyReportId: string },
     params: UpdateRunEntryParams
   ): Promise<RunEntryEntity> {
     const { runEntryId, weeklyReportId } = key;
-    const { runDistance, goalDistance } = params;
+
+    const { updateExpression, expressionAttributeValues } =
+      this.buildParitalUpdate(params);
 
     const updateCommand = new UpdateItemCommand({
       TableName: DALSAMO_SINGLE_TABLE,
@@ -67,11 +131,8 @@ class RunEntryService {
         PK: { S: `weeklyReport#${weeklyReportId}` },
         SK: { S: `runEntry#${runEntryId}` },
       },
-      UpdateExpression: 'SET runDistance = :rd, goalDistance = :gd',
-      ExpressionAttributeValues: {
-        ':rd': { N: `${runDistance}` },
-        ':gd': { N: `${goalDistance}` },
-      },
+      UpdateExpression: updateExpression,
+      ExpressionAttributeValues: expressionAttributeValues,
       ReturnValues: ReturnValue.ALL_NEW,
     });
 
@@ -119,6 +180,7 @@ class RunEntryService {
       runDistance: { N: runDistance },
       userName: { S: userName },
       GSI: { S: userId },
+      imageUrls,
     } = runEntryDocument;
 
     return {
@@ -127,6 +189,7 @@ class RunEntryService {
       runDistance: _.toNumber(runDistance),
       userId: _.split(userId, '#')[1],
       userName,
+      imageUrls: imageUrls ? imageUrls.SS : [],
     };
   }
 }

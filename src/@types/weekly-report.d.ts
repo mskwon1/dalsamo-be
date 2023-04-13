@@ -4,6 +4,7 @@ type RunEntryEntity = {
   goalDistance: number;
   userId: string;
   userName: string;
+  imageUrls: string[];
 };
 
 type WeeklyReportEntity = {
