@@ -19,9 +19,9 @@ const handler: ValidatedEventAPIGatewayProxyEvent<
   JWTVerifiedBody
 > = async (event) => {
   const {
-    pathParameters: { weeklyReportId, runEntryId },
+    pathParameters: { runEntryId },
   } = event;
-  const { runDistance, imageUrls } = event.body;
+  const { weeklyReportId, runDistance, imageUrls } = event.body;
   const { payload } = event.auth;
 
   const userService = new UserService(client);
