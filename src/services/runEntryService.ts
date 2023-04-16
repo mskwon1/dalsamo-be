@@ -42,7 +42,7 @@ class RunEntryService {
       const readRunEntriesCommand = new QueryCommand({
         TableName: DALSAMO_SINGLE_TABLE,
         IndexName: DBIndexName.ET_GSI,
-        KeyConditionExpression: 'EntityType = :pk_val, GSI = :gsi_val',
+        KeyConditionExpression: 'EntityType = :pk_val AND GSI = :gsi_val',
         ExpressionAttributeValues: {
           ':pk_val': { S: 'runEntry' },
           ':gsi_val': { S: `user#${userId}` },
@@ -55,7 +55,7 @@ class RunEntryService {
 
       console.log({ runEntriesChunk, LastEvaluatedKey });
 
-      runEntries.concat(runEntriesChunk);
+      runEntries.push(...runEntriesChunk);
       lastKey = LastEvaluatedKey;
     } while (!_.isNil(lastKey));
 
