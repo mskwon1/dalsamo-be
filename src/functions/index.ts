@@ -10,6 +10,7 @@ import getMe from './user/me';
 import createFine from './fine/create';
 import uploadRunEntryImage from './utils/upload-run-entry-image';
 import updateRunEntry from './run-entry/update';
+import getFineStatus from './fine/status';
 
 const functions = {
   findAllUsers,
@@ -24,6 +25,7 @@ const functions = {
   createFine,
   uploadRunEntryImage,
   updateRunEntry,
+  getFineStatus,
 };
 
 export default functions;
