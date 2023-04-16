@@ -15,7 +15,7 @@ const getFineStatus: LambdaFunctionEntry = {
   iamRoleStatements: [
     {
       Effect: 'Allow',
-      Action: ['dynamodb:GetItem'],
+      Action: ['dynamodb:Query'],
       Resource: [
         { 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] },
         {
