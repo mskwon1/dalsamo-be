@@ -1,5 +1,6 @@
 type RunEntryEntity = {
   id: string;
+  weeklyReportId: string;
   runDistance: number;
   goalDistance: number;
   userId: string;

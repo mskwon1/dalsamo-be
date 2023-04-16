@@ -4,12 +4,13 @@ import {
   DynamoDBClient,
   GetItemCommand,
   PutRequest,
+  QueryCommand,
   ReturnConsumedCapacity,
   ReturnValue,
   UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
-import { DALSAMO_SINGLE_TABLE } from 'src/constants';
+import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
 import { generateKSUID } from 'src/utils';
 
 type CreateRunEntryParams = {
@@ -31,6 +32,36 @@ class RunEntryService {
 
   constructor(client: DynamoDBClient) {
     this.client = client;
+  }
+
+  async findAllByUser(userId: string): Promise<RunEntryEntity[]> {
+    const runEntries = [];
+
+    let lastKey: Record<string, AttributeValue> | undefined;
+    do {
+      const readRunEntriesCommand = new QueryCommand({
+        TableName: DALSAMO_SINGLE_TABLE,
+        IndexName: DBIndexName.ET_GSI,
+        KeyConditionExpression: 'EntityType = :pk_val, GSI = :gsi_val',
+        ExpressionAttributeValues: {
+          ':pk_val': { S: 'runEntry' },
+          ':gsi_val': { S: `user#${userId}` },
+        },
+        ExclusiveStartKey: lastKey,
+      });
+
+      const { Items: runEntriesChunk, LastEvaluatedKey } =
+        await this.client.send(readRunEntriesCommand);
+
+      console.log({ runEntriesChunk, LastEvaluatedKey });
+
+      runEntries.concat(runEntriesChunk);
+      lastKey = LastEvaluatedKey;
+    } while (!_.isNil(lastKey));
+
+    console.log(runEntries);
+
+    return _.map(runEntries, RunEntryService.parseRunEntryDocument);
   }
 
   async findOneByKey(key: {
@@ -177,6 +208,7 @@ class RunEntryService {
     runEntryDocument: Record<string, AttributeValue>
   ): RunEntryEntity {
     const {
+      PK: { S: weeklyReportId },
       SK: { S: id },
       goalDistance: { N: goalDistance },
       runDistance: { N: runDistance },
@@ -187,6 +219,7 @@ class RunEntryService {
 
     return {
       id: _.split(id, '#')[1],
+      weeklyReportId: _.split(weeklyReportId, '#')[1],
       goalDistance: _.toNumber(goalDistance),
       runDistance: _.toNumber(runDistance),
       userId: _.split(userId, '#')[1],
