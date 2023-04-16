@@ -46,7 +46,7 @@ class FineService {
 
       console.log({ finesChunk, LastEvaluatedKey });
 
-      fines.concat(finesChunk);
+      fines.push(...finesChunk);
       lastKey = LastEvaluatedKey;
     } while (!_.isNil(lastKey));
 
