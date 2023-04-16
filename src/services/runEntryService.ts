@@ -42,8 +42,8 @@ class RunEntryService {
     const getRunEntryItemCommand = new GetItemCommand({
       TableName: DALSAMO_SINGLE_TABLE,
       Key: {
-        PK: { S: `weeklyReportId#${weeklyReportId}` },
-        SK: { S: `runEntryId#${runEntryId}` },
+        PK: { S: `weeklyReport#${weeklyReportId}` },
+        SK: { S: `runEntry#${runEntryId}` },
       },
     });
 
@@ -92,23 +92,25 @@ class RunEntryService {
       };
     }
 
-    let updateExpression = 'SET';
+    const expressions = [];
     const expressionAttributeValues: Record<string, AttributeValue> = {};
 
     if (!_.isNil(runDistance)) {
-      updateExpression += ' runDistance = :rd';
+      expressions.push('runDistance = :rd');
       expressionAttributeValues[':rd'] = { N: `${runDistance}` };
     }
 
     if (!_.isNil(goalDistance)) {
-      updateExpression += ' goalDistance = :gd';
+      expressions.push('goalDistance = :gd');
       expressionAttributeValues[':gd'] = { N: `${goalDistance}` };
     }
 
     if (!_.isNil(imageUrls)) {
-      updateExpression += ' imageUrls = :imgs';
+      expressions.push('imageUrls = :imgs');
       expressionAttributeValues[':imgs'] = { SS: imageUrls };
     }
+
+    const updateExpression = `SET ${expressions.join(', ')}`;
 
     return {
       updateExpression,

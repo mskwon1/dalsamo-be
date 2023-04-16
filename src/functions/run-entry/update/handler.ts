@@ -44,7 +44,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<
     }
 
     if (
-      targetEntry.userId !== payload.id ||
+      targetEntry.userId !== payload.id &&
       !currentUser.roles.includes('admin')
     ) {
       return formatErrorResponse(403, { message: 'not authenticated' });
