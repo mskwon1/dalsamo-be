@@ -3,15 +3,23 @@ import type {
   APIGatewayProxyResult,
   Handler,
 } from 'aws-lambda';
+import { JWTPayload } from 'jose';
 import type { FromSchema } from 'json-schema-to-ts';
 
-type ValidatedAPIGatewayProxyEvent<S> = Omit<APIGatewayProxyEvent, 'body'> & {
+export type ValidatedAPIGatewayProxyEvent<S> = Omit<
+  APIGatewayProxyEvent,
+  'body'
+> & {
   body: FromSchema<S>;
 };
-export type ValidatedEventAPIGatewayProxyEvent<S> = Handler<
-  ValidatedAPIGatewayProxyEvent<S>,
+export type ValidatedEventAPIGatewayProxyEvent<S, K = unknown> = Handler<
+  ValidatedAPIGatewayProxyEvent<S> & K,
   APIGatewayProxyResult
 >;
+
+export type JWTVerifiedBody = {
+  auth: { payload: JWTPayload; token: string };
+};
 
 export const formatJSONResponse = (
   response: Record<string, unknown>,

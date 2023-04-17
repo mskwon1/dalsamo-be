@@ -11,6 +11,9 @@ import WeeklyReportService from 'src/services/weeklyReportService';
 import { MAX_GOAL_DISTANCE } from 'src/constants';
 import uploadFileToDalsamoCdn from '@libs/upload-dalsamo-cdn';
 import sharp from 'sharp';
+import httpHeaderNormalizer from '@middy/http-header-normalizer';
+import verifyJwtMiddleware from 'src/middlewares/verifyJwtMiddleware';
+import verifyAdminMiddleware from 'src/middlewares/verifyAdminMiddleware';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
@@ -109,4 +112,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   }
 };
 
-export const main = middyfy(handler);
+export const main = middyfy(handler)
+  .use(httpHeaderNormalizer())
+  .use(verifyJwtMiddleware({ passthrough: false }))
+  .use(verifyAdminMiddleware);

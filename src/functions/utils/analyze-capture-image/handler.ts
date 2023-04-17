@@ -6,6 +6,7 @@ import sharp from 'sharp';
 import { parseRundayImage } from '@libs/parse-runday-image';
 import { createWorker } from 'tesseract.js';
 import { Handler } from 'aws-lambda';
+import verifyJwtMiddleware from 'src/middlewares/verifyJwtMiddleware';
 
 const analyzeCaptureImage: Handler<{
   body: {
@@ -42,4 +43,5 @@ const analyzeCaptureImage: Handler<{
 
 export const main = middy(analyzeCaptureImage)
   .use(httpHeaderNormalizer())
-  .use(httpMultipartBodyParser());
+  .use(httpMultipartBodyParser())
+  .use(verifyJwtMiddleware({ passthrough: false }));

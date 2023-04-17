@@ -5,6 +5,9 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 
 import schema from './schema';
 import UserService from 'src/services/userService';
+import verifyJwtMiddleware from 'src/middlewares/verifyJwtMiddleware';
+import httpHeaderNormalizer from '@middy/http-header-normalizer';
+import verifyAdminMiddleware from 'src/middlewares/verifyAdminMiddleware';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
@@ -25,4 +28,7 @@ const createUser: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   }
 };
 
-export const main = middyfy(createUser);
+export const main = middyfy(createUser)
+  .use(httpHeaderNormalizer())
+  .use(verifyJwtMiddleware({ passthrough: false }))
+  .use(verifyAdminMiddleware);

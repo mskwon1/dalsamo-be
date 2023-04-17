@@ -18,22 +18,21 @@ const verifyJwtMiddleware: (options: {
       const { authorization } = headers;
       console.log(authorization);
 
-      if (!authorization) {
-        return;
+      if (!authorization && !passthrough) {
+        return formatErrorResponse(401, { message: 'missing token' });
       }
 
       const token = _.split(authorization, ' ')[1];
       console.log(token);
 
-      if (!token) {
-        return formatErrorResponse(401, { message: 'token does not exist' });
+      if (!token && !passthrough) {
+        return formatErrorResponse(401, { message: 'missing token' });
       }
 
       try {
         const jwtPayload = await verifyDalsamoJwt(token);
 
         console.log(jwtPayload);
-
         event.auth = {
           payload: jwtPayload,
           token,

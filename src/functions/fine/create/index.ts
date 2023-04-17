@@ -2,13 +2,13 @@ import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
-const createUser: LambdaFunctionEntry = {
+const createFine: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
       http: {
         method: 'post',
-        path: 'users',
+        path: 'fines',
         request: {
           schemas: {
             'application/json': schema,
@@ -27,4 +27,4 @@ const createUser: LambdaFunctionEntry = {
   ],
 };
 
-export default createUser;
+export default createFine;

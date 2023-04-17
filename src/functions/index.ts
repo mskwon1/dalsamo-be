@@ -7,6 +7,11 @@ import closeWeeklyReport from './weekly-report/close';
 import analyzeCaptureImage from './utils/analyze-capture-image';
 import login from './auth/login';
 import getMe from './user/me';
+import createFine from './fine/create';
+import uploadRunEntryImage from './utils/upload-run-entry-image';
+import updateRunEntry from './run-entry/update';
+import getFineStatus from './fine/status';
+import getUserRunEntries from './run-entry/me';
 
 const functions = {
   findAllUsers,
@@ -18,6 +23,11 @@ const functions = {
   analyzeCaptureImage,
   login,
   getMe,
+  createFine,
+  uploadRunEntryImage,
+  updateRunEntry,
+  getFineStatus,
+  getUserRunEntries,
 };
 
 export default functions;

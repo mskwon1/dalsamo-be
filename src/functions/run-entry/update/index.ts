@@ -2,14 +2,17 @@ import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
-const openWeeklyReport: LambdaFunctionEntry = {
+const updateRunEntry: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
       http: {
-        method: 'post',
-        path: 'weekly-reports/open',
+        method: 'put',
+        path: 'run-entries/{runEntryId}',
         request: {
+          parameters: {
+            paths: { runEntryId: true },
+          },
           schemas: {
             'application/json': schema,
           },
@@ -21,11 +24,7 @@ const openWeeklyReport: LambdaFunctionEntry = {
   iamRoleStatements: [
     {
       Effect: 'Allow',
-      Action: [
-        'dynamodb:PutItem',
-        'dynamodb:BatchWriteItem',
-        'dynamodb:GetItem',
-      ],
+      Action: ['dynamodb:UpdateItem', 'dynamodb:GetItem'],
       Resource: [
         { 'Fn::GetAtt': ['dalsamoSingleTable', 'Arn'] },
         {
@@ -39,4 +38,4 @@ const openWeeklyReport: LambdaFunctionEntry = {
   ],
 };
 
-export default openWeeklyReport;
+export default updateRunEntry;

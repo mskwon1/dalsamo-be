@@ -100,6 +100,26 @@ const serverlessConfiguration: AWS = {
                 WriteCapacityUnits: 1,
               },
             },
+            {
+              IndexName: 'et_gsi',
+              KeySchema: [
+                {
+                  AttributeName: 'EntityType',
+                  KeyType: 'HASH',
+                },
+                {
+                  AttributeName: 'GSI',
+                  KeyType: 'RANGE',
+                },
+              ],
+              Projection: {
+                ProjectionType: 'ALL',
+              },
+              ProvisionedThroughput: {
+                ReadCapacityUnits: 1,
+                WriteCapacityUnits: 1,
+              },
+            },
           ],
           BillingMode: 'PROVISIONED',
           TableName: '${sls:stage}-dalsamo-single-table',
