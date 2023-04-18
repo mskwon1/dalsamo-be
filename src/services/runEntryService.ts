@@ -11,6 +11,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
 import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
+import WeeklyReportService from './weeklyReportService';
 import { generateKSUID } from 'src/utils';
 
 type CreateRunEntryParams = {
@@ -35,6 +36,30 @@ class RunEntryService {
   }
 
   async findAllByUser(userId: string): Promise<RunEntryEntity[]> {
+    // NEEDS TO BE REFACTORED
+    const readWeeklyReportsCommand = new QueryCommand({
+      TableName: DALSAMO_SINGLE_TABLE,
+      IndexName: DBIndexName.ET_PK,
+      KeyConditionExpression: 'EntityType = :pk_val',
+      ExpressionAttributeValues: { ':pk_val': { S: 'weeklyReport' } },
+    });
+
+    const { Items: weeklyReports } = await this.client.send(
+      readWeeklyReportsCommand
+    );
+
+    const parsedWeeklyReports = _.map(
+      weeklyReports,
+      WeeklyReportService.parseWeeklyReportDocument
+    );
+
+    const pendingWeeklyReportIds = _.map(
+      _.filter(parsedWeeklyReports, {
+        status: 'pending',
+      }),
+      'id'
+    );
+
     const runEntries = [];
 
     let lastKey: Record<string, AttributeValue> | undefined;
@@ -59,9 +84,14 @@ class RunEntryService {
       lastKey = LastEvaluatedKey;
     } while (!_.isNil(lastKey));
 
-    console.log(runEntries);
+    const parsedRunEntries = _.map(
+      runEntries,
+      RunEntryService.parseRunEntryDocument
+    );
 
-    return _.map(runEntries, RunEntryService.parseRunEntryDocument);
+    return parsedRunEntries.filter(
+      (entry) => !pendingWeeklyReportIds.includes(entry.weeklyReportId)
+    );
   }
 
   async findOneByKey(key: {
