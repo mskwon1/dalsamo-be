@@ -89,8 +89,8 @@ class RunEntryService {
       RunEntryService.parseRunEntryDocument
     );
 
-    return parsedRunEntries.filter((entry) =>
-      pendingWeeklyReportIds.includes(entry.weeklyReportId)
+    return parsedRunEntries.filter(
+      (entry) => !pendingWeeklyReportIds.includes(entry.weeklyReportId)
     );
   }
 
