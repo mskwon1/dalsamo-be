@@ -6,6 +6,7 @@ type RunEntryEntity = {
   userId: string;
   userName: string;
   imageUrls: string[];
+  season: string;
 };
 
 type WeeklyReportEntity = {

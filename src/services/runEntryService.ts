@@ -20,6 +20,7 @@ type CreateRunEntryParams = {
   userName: string;
   runDistance: number;
   goalDistance: number;
+  season: string;
 };
 
 type UpdateRunEntryParams = {
@@ -33,6 +34,38 @@ class RunEntryService {
 
   constructor(client: DynamoDBClient) {
     this.client = client;
+  }
+
+  async findAll(): Promise<RunEntryEntity[]> {
+    const runEntries = [];
+
+    let lastKey: Record<string, AttributeValue> | undefined;
+    do {
+      const readRunEntriesCommand = new QueryCommand({
+        TableName: DALSAMO_SINGLE_TABLE,
+        IndexName: DBIndexName.ET_GSI,
+        KeyConditionExpression: 'EntityType = :pk_val',
+        ExpressionAttributeValues: {
+          ':pk_val': { S: 'runEntry' },
+        },
+        ExclusiveStartKey: lastKey,
+      });
+
+      const { Items: runEntriesChunk, LastEvaluatedKey } =
+        await this.client.send(readRunEntriesCommand);
+
+      console.log({ runEntriesChunk, LastEvaluatedKey });
+
+      runEntries.push(...runEntriesChunk);
+      lastKey = LastEvaluatedKey;
+    } while (!_.isNil(lastKey));
+
+    const parsedRunEntries = _.map(
+      runEntries,
+      RunEntryService.parseRunEntryDocument
+    );
+
+    return parsedRunEntries;
   }
 
   async findAllByUser(userId: string): Promise<RunEntryEntity[]> {
@@ -117,13 +150,13 @@ class RunEntryService {
     return RunEntryService.parseRunEntryDocument(Item);
   }
 
-  async createMany(
+  async createOrUpdateMany(
     entries: CreateRunEntryParams[]
   ): Promise<{ createdItemsCount: number }> {
     const command = new BatchWriteItemCommand({
       RequestItems: {
         [DALSAMO_SINGLE_TABLE]: entries.map((entry) => {
-          return { PutRequest: this.generatePutRequest(entry) };
+          return { PutRequest: RunEntryService.generatePutRequest(entry) };
         }),
       },
       ReturnConsumedCapacity: ReturnConsumedCapacity.TOTAL,
@@ -204,20 +237,22 @@ class RunEntryService {
     return RunEntryService.parseRunEntryDocument(Attributes);
   }
 
-  generatePutRequest({
-    runEntryId,
+  static generatePutRequest({
+    id: runEntryId,
     weeklyReportId,
     userId,
     userName,
     runDistance,
     goalDistance,
+    season,
   }: {
-    runEntryId?: string;
+    id?: string;
     weeklyReportId: string;
     userId: string;
     userName: string;
     runDistance: number;
     goalDistance: number;
+    season: string;
   }): PutRequest {
     const id = runEntryId || generateKSUID();
 
@@ -230,6 +265,7 @@ class RunEntryService {
         goalDistance: { N: `${goalDistance}` },
         GSI: { S: `user#${userId}` },
         userName: { S: userName },
+        season: { S: season },
       },
     };
   }
@@ -255,6 +291,7 @@ class RunEntryService {
       userId: _.split(userId, '#')[1],
       userName,
       imageUrls: imageUrls ? imageUrls.SS : [],
+      season: runEntryDocument.season?.S || '',
     };
   }
 }

@@ -12,6 +12,7 @@ import uploadRunEntryImage from './utils/upload-run-entry-image';
 import updateRunEntry from './run-entry/update';
 import getFineStatus from './fine/status';
 import getUserRunEntries from './run-entry/me';
+import migrateSeason from './run-entry/migrateSeason';
 
 const functions = {
   findAllUsers,
@@ -28,6 +29,7 @@ const functions = {
   updateRunEntry,
   getFineStatus,
   getUserRunEntries,
+  migrateSeason,
 };
 
 export default functions;

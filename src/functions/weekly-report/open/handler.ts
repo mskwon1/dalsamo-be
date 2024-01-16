@@ -26,7 +26,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
       status: 'pending',
     });
 
-    const { createdItemsCount } = await runEntryService.createMany(
+    const { createdItemsCount } = await runEntryService.createOrUpdateMany(
       _.map(runEntries, (rawEntry) => {
         const { userId, goalDistance, userName } = rawEntry;
 
