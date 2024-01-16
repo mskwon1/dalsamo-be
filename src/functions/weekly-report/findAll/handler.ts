@@ -9,12 +9,13 @@ const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 const findAllWeeklyReports: APIGatewayProxyHandler = async (event) => {
   const { queryStringParameters } = event;
   const limit = queryStringParameters?.limit;
+  const season = queryStringParameters?.season;
 
   const weeklyReportService = new WeeklyReportService(client);
 
   try {
     const weeklyReports = await weeklyReportService.findAll(
-      limit ? { limit: _.toNumber(limit) } : {}
+      limit ? { limit: _.toNumber(limit), season } : { season }
     );
 
     return formatJSONResponse({ weeklyReports });

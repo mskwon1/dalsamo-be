@@ -87,15 +87,25 @@ class WeeklyReportService {
     };
   }
 
-  async findAll(params: { limit?: number }): Promise<WeeklyReportEntity[]> {
-    const { limit = 10 } = params;
+  async findAll(params: {
+    limit?: number;
+    season?: string;
+  }): Promise<WeeklyReportEntity[]> {
+    const { limit = 10, season } = params;
 
     const readWeeklyReportsCommand = new QueryCommand({
       TableName: DALSAMO_SINGLE_TABLE,
       IndexName: DBIndexName.ET_PK,
       Limit: limit,
       KeyConditionExpression: 'EntityType = :pk_val',
-      ExpressionAttributeValues: { ':pk_val': { S: 'weeklyReport' } },
+      FilterExpression: 'season = :season',
+      ExpressionAttributeValues: _.omitBy(
+        {
+          ':pk_val': { S: 'weeklyReport' },
+          ':season': season ? { S: season } : undefined,
+        },
+        _.isUndefined
+      ),
     });
 
     const { Items: weeklyReports } = await this.client.send(
