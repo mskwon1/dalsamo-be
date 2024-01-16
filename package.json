@@ -23,7 +23,7 @@
     "tesseract.js": "^4.0.3"
   },
   "devDependencies": {
-    "@serverless/typescript": "^3.27.0",
+    "@serverless/typescript": "^3.38.0",
     "@types/aws-lambda": "^8.10.71",
     "@types/node": "^16.10.0",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
@@ -34,7 +34,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "json-schema-to-ts": "^1.5.0",
     "prettier": "^2.8.4",
-    "serverless": "^3.27.0",
+    "serverless": "^3.38.0",
     "serverless-dotenv-plugin": "^6.0.0",
     "serverless-esbuild": "^1.23.3",
     "serverless-iam-roles-per-function": "^3.2.0",
