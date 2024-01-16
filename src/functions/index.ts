@@ -13,6 +13,7 @@ import updateRunEntry from './run-entry/update';
 import getFineStatus from './fine/status';
 import getUserRunEntries from './run-entry/me';
 import migrateWeeklyReportSeason from './weekly-report/migrateSeason';
+import migrateRunEntrySeason from './run-entry/migrateSeason';
 
 const functions = {
   findAllUsers,
@@ -30,6 +31,7 @@ const functions = {
   getFineStatus,
   getUserRunEntries,
   migrateWeeklyReportSeason,
+  migrateRunEntrySeason,
 };
 
 export default functions;
