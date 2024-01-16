@@ -72,13 +72,25 @@ class RunEntryService {
     return parsedRunEntries;
   }
 
-  async findAllByUser(userId: string): Promise<RunEntryEntity[]> {
+  async findAllByUser(
+    userId: string,
+    params: { season?: string }
+  ): Promise<RunEntryEntity[]> {
+    const { season } = params;
+
     // NEEDS TO BE REFACTORED
     const readWeeklyReportsCommand = new QueryCommand({
       TableName: DALSAMO_SINGLE_TABLE,
       IndexName: DBIndexName.ET_PK,
       KeyConditionExpression: 'EntityType = :pk_val',
-      ExpressionAttributeValues: { ':pk_val': { S: 'weeklyReport' } },
+      FilterExpression: season ? 'season = :season' : undefined,
+      ExpressionAttributeValues: _.omitBy(
+        {
+          ':pk_val': { S: 'weeklyReport' },
+          ':season': season ? { S: season } : undefined,
+        },
+        _.isUndefined
+      ),
     });
 
     const { Items: weeklyReports } = await this.client.send(
@@ -105,10 +117,15 @@ class RunEntryService {
         TableName: DALSAMO_SINGLE_TABLE,
         IndexName: DBIndexName.ET_GSI,
         KeyConditionExpression: 'EntityType = :pk_val AND GSI = :gsi_val',
-        ExpressionAttributeValues: {
-          ':pk_val': { S: 'runEntry' },
-          ':gsi_val': { S: `user#${userId}` },
-        },
+        FilterExpression: season ? 'season = :season' : undefined,
+        ExpressionAttributeValues: _.omitBy(
+          {
+            ':pk_val': { S: 'runEntry' },
+            ':gsi_val': { S: `user#${userId}` },
+            ':season': season ? { S: season } : undefined,
+          },
+          _.isUndefined
+        ),
         ExclusiveStartKey: lastKey,
       });
 
