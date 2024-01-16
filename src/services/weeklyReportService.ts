@@ -98,7 +98,7 @@ class WeeklyReportService {
       IndexName: DBIndexName.ET_PK,
       Limit: limit,
       KeyConditionExpression: 'EntityType = :pk_val',
-      FilterExpression: 'season = :season',
+      FilterExpression: season ? 'season = :season' : undefined,
       ExpressionAttributeValues: _.omitBy(
         {
           ':pk_val': { S: 'weeklyReport' },
