@@ -1,7 +1,7 @@
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionEntry } from 'src/utils';
 
-const migrateSeason: LambdaFunctionEntry = {
+const migrateRunEntrySeason: LambdaFunctionEntry = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   iamRoleStatements: [
     {
@@ -20,4 +20,4 @@ const migrateSeason: LambdaFunctionEntry = {
   ],
 };
 
-export default migrateSeason;
+export default migrateRunEntrySeason;
