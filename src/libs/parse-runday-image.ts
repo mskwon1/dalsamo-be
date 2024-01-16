@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Tesseract from 'tesseract.js';
 
 const USERNAMES_RECTANGLE_PRESET = {
   left: 170,
