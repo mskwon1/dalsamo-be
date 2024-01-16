@@ -10,7 +10,11 @@ import {
   UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
-import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
+import {
+  BATCH_WRITE_MAX_ELEMENTS,
+  DALSAMO_SINGLE_TABLE,
+  DBIndexName,
+} from 'src/constants';
 import WeeklyReportService from './weeklyReportService';
 import { generateKSUID } from 'src/utils';
 
@@ -153,22 +157,27 @@ class RunEntryService {
   async createOrUpdateMany(
     entries: CreateRunEntryParams[]
   ): Promise<{ createdItemsCount: number }> {
-    const command = new BatchWriteItemCommand({
-      RequestItems: {
-        [DALSAMO_SINGLE_TABLE]: entries.map((entry) => {
-          return { PutRequest: RunEntryService.generatePutRequest(entry) };
-        }),
-      },
-      ReturnConsumedCapacity: ReturnConsumedCapacity.TOTAL,
-    });
+    const chunkedEntries = _.chunk(entries, BATCH_WRITE_MAX_ELEMENTS);
 
-    const { ConsumedCapacity } = await this.client.send(command);
+    let createdItemsCount = 0;
+    for (const entriesChunk of chunkedEntries) {
+      const command = new BatchWriteItemCommand({
+        RequestItems: {
+          [DALSAMO_SINGLE_TABLE]: entriesChunk.map((entry) => {
+            return { PutRequest: RunEntryService.generatePutRequest(entry) };
+          }),
+        },
+        ReturnConsumedCapacity: ReturnConsumedCapacity.TOTAL,
+      });
 
-    const createdItemsCount = _.chain(ConsumedCapacity)
-      .filter({ TableName: DALSAMO_SINGLE_TABLE })
-      .head()
-      .get('CapacityUnits', 0)
-      .value();
+      const { ConsumedCapacity } = await this.client.send(command);
+
+      createdItemsCount += _.chain(ConsumedCapacity)
+        .filter({ TableName: DALSAMO_SINGLE_TABLE })
+        .head()
+        .get('CapacityUnits', 0)
+        .value();
+    }
 
     return { createdItemsCount };
   }
