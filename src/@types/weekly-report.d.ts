@@ -14,6 +14,7 @@ type WeeklyReportEntity = {
   startDate: string;
   status: 'pending' | 'confirmed';
   reportImageUrl: string | null;
+  season: string;
 };
 
 type ComposedWeeklyReportEntity = WeeklyReportEntity & {

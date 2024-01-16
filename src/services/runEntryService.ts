@@ -177,6 +177,9 @@ class RunEntryService {
         .head()
         .get('CapacityUnits', 0)
         .value();
+
+      // pause due to write capacity limits
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
     return { createdItemsCount };

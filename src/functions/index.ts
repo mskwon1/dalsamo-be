@@ -12,7 +12,7 @@ import uploadRunEntryImage from './utils/upload-run-entry-image';
 import updateRunEntry from './run-entry/update';
 import getFineStatus from './fine/status';
 import getUserRunEntries from './run-entry/me';
-import migrateRunEntrySeason from './run-entry/migrateSeason';
+import migrateWeeklyReportSeason from './weekly-report/migrateSeason';
 
 const functions = {
   findAllUsers,
@@ -29,7 +29,7 @@ const functions = {
   updateRunEntry,
   getFineStatus,
   getUserRunEntries,
-  migrateRunEntrySeason,
+  migrateWeeklyReportSeason,
 };
 
 export default functions;

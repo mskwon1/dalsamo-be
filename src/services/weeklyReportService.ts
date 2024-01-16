@@ -1,5 +1,6 @@
 import {
   AttributeValue,
+  BatchWriteItemCommand,
   DynamoDBClient,
   PutItemCommand,
   PutRequest,
@@ -9,7 +10,11 @@ import {
   UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
-import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
+import {
+  BATCH_WRITE_MAX_ELEMENTS,
+  DALSAMO_SINGLE_TABLE,
+  DBIndexName,
+} from 'src/constants';
 import RunEntryService from './runEntryService';
 import { generateKSUID } from 'src/utils';
 import FineService from './fineService';
@@ -17,6 +22,14 @@ import FineService from './fineService';
 type CreateWeeklyReportParams = {
   startDate: string;
   status: 'pending' | 'confirmed';
+  season: string;
+};
+
+type CreateOrUpdateManyWeeklyReportElement = {
+  weeklyReportId: string;
+  startDate: string;
+  status: 'pending' | 'confirmed';
+  season: string;
 };
 
 type UpdateWeeklyReportParams = {
@@ -92,12 +105,45 @@ class WeeklyReportService {
     return _.map(weeklyReports, WeeklyReportService.parseWeeklyReportDocument);
   }
 
+  async createOrUpdateMany(
+    entries: CreateOrUpdateManyWeeklyReportElement[]
+  ): Promise<{ createdItemsCount: number }> {
+    const chunkedEntries = _.chunk(entries, BATCH_WRITE_MAX_ELEMENTS);
+
+    let createdItemsCount = 0;
+    for (const entriesChunk of chunkedEntries) {
+      const command = new BatchWriteItemCommand({
+        RequestItems: {
+          [DALSAMO_SINGLE_TABLE]: entriesChunk.map((entry) => {
+            return {
+              PutRequest: WeeklyReportService.generatePutRequest(entry),
+            };
+          }),
+        },
+        ReturnConsumedCapacity: ReturnConsumedCapacity.TOTAL,
+      });
+
+      const { ConsumedCapacity } = await this.client.send(command);
+
+      createdItemsCount += _.chain(ConsumedCapacity)
+        .filter({ TableName: DALSAMO_SINGLE_TABLE })
+        .head()
+        .get('CapacityUnits', 0)
+        .value();
+
+      // pause due to write capacity limits
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    return { createdItemsCount };
+  }
+
   async create(params: CreateWeeklyReportParams): Promise<string> {
     const weeklyReportId = this.generateId();
 
     const command = new PutItemCommand({
       TableName: DALSAMO_SINGLE_TABLE,
-      ...this.generatePutRequest({
+      ...WeeklyReportService.generatePutRequest({
         weeklyReportId,
         ...params,
       }),
@@ -141,15 +187,17 @@ class WeeklyReportService {
     return WeeklyReportService.parseWeeklyReportDocument(Attributes);
   }
 
-  generatePutRequest({
+  static generatePutRequest({
     weeklyReportId,
     startDate,
     status,
     reportImageUrl,
+    season,
   }: {
     weeklyReportId: string;
     startDate: string;
     status: 'pending' | 'confirmed';
+    season: string;
     reportImageUrl?: string;
   }): PutRequest {
     return {
@@ -161,6 +209,7 @@ class WeeklyReportService {
           EntityType: { S: 'weeklyReport' },
           status: { S: status },
           reportImageUrl: reportImageUrl ? { S: reportImageUrl } : undefined,
+          season: { S: season },
         },
         _.isUndefined
       ),
@@ -182,6 +231,7 @@ class WeeklyReportService {
       startDate,
       status,
       reportImageUrl: reportImageUrl ? reportImageUrl.S : null,
+      season: weeklyReportDocument.season?.S || '',
     } as WeeklyReportEntity;
   }
 }
