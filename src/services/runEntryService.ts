@@ -10,7 +10,11 @@ import {
   UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import * as _ from 'lodash';
-import { DALSAMO_SINGLE_TABLE, DBIndexName } from 'src/constants';
+import {
+  BATCH_WRITE_MAX_ELEMENTS,
+  DALSAMO_SINGLE_TABLE,
+  DBIndexName,
+} from 'src/constants';
 import WeeklyReportService from './weeklyReportService';
 import { generateKSUID } from 'src/utils';
 
@@ -20,6 +24,7 @@ type CreateRunEntryParams = {
   userName: string;
   runDistance: number;
   goalDistance: number;
+  season: string;
 };
 
 type UpdateRunEntryParams = {
@@ -33,6 +38,38 @@ class RunEntryService {
 
   constructor(client: DynamoDBClient) {
     this.client = client;
+  }
+
+  async findAll(): Promise<RunEntryEntity[]> {
+    const runEntries = [];
+
+    let lastKey: Record<string, AttributeValue> | undefined;
+    do {
+      const readRunEntriesCommand = new QueryCommand({
+        TableName: DALSAMO_SINGLE_TABLE,
+        IndexName: DBIndexName.ET_GSI,
+        KeyConditionExpression: 'EntityType = :pk_val',
+        ExpressionAttributeValues: {
+          ':pk_val': { S: 'runEntry' },
+        },
+        ExclusiveStartKey: lastKey,
+      });
+
+      const { Items: runEntriesChunk, LastEvaluatedKey } =
+        await this.client.send(readRunEntriesCommand);
+
+      console.log({ runEntriesChunk, LastEvaluatedKey });
+
+      runEntries.push(...runEntriesChunk);
+      lastKey = LastEvaluatedKey;
+    } while (!_.isNil(lastKey));
+
+    const parsedRunEntries = _.map(
+      runEntries,
+      RunEntryService.parseRunEntryDocument
+    );
+
+    return parsedRunEntries;
   }
 
   async findAllByUser(userId: string): Promise<RunEntryEntity[]> {
@@ -117,25 +154,33 @@ class RunEntryService {
     return RunEntryService.parseRunEntryDocument(Item);
   }
 
-  async createMany(
+  async createOrUpdateMany(
     entries: CreateRunEntryParams[]
   ): Promise<{ createdItemsCount: number }> {
-    const command = new BatchWriteItemCommand({
-      RequestItems: {
-        [DALSAMO_SINGLE_TABLE]: entries.map((entry) => {
-          return { PutRequest: this.generatePutRequest(entry) };
-        }),
-      },
-      ReturnConsumedCapacity: ReturnConsumedCapacity.TOTAL,
-    });
+    const chunkedEntries = _.chunk(entries, BATCH_WRITE_MAX_ELEMENTS);
 
-    const { ConsumedCapacity } = await this.client.send(command);
+    let createdItemsCount = 0;
+    for (const entriesChunk of chunkedEntries) {
+      const command = new BatchWriteItemCommand({
+        RequestItems: {
+          [DALSAMO_SINGLE_TABLE]: entriesChunk.map((entry) => {
+            return { PutRequest: RunEntryService.generatePutRequest(entry) };
+          }),
+        },
+        ReturnConsumedCapacity: ReturnConsumedCapacity.TOTAL,
+      });
 
-    const createdItemsCount = _.chain(ConsumedCapacity)
-      .filter({ TableName: DALSAMO_SINGLE_TABLE })
-      .head()
-      .get('CapacityUnits', 0)
-      .value();
+      const { ConsumedCapacity } = await this.client.send(command);
+
+      createdItemsCount += _.chain(ConsumedCapacity)
+        .filter({ TableName: DALSAMO_SINGLE_TABLE })
+        .head()
+        .get('CapacityUnits', 0)
+        .value();
+
+      // pause due to write capacity limits
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
 
     return { createdItemsCount };
   }
@@ -204,20 +249,22 @@ class RunEntryService {
     return RunEntryService.parseRunEntryDocument(Attributes);
   }
 
-  generatePutRequest({
-    runEntryId,
+  static generatePutRequest({
+    id: runEntryId,
     weeklyReportId,
     userId,
     userName,
     runDistance,
     goalDistance,
+    season,
   }: {
-    runEntryId?: string;
+    id?: string;
     weeklyReportId: string;
     userId: string;
     userName: string;
     runDistance: number;
     goalDistance: number;
+    season: string;
   }): PutRequest {
     const id = runEntryId || generateKSUID();
 
@@ -230,6 +277,7 @@ class RunEntryService {
         goalDistance: { N: `${goalDistance}` },
         GSI: { S: `user#${userId}` },
         userName: { S: userName },
+        season: { S: season },
       },
     };
   }
@@ -255,6 +303,7 @@ class RunEntryService {
       userId: _.split(userId, '#')[1],
       userName,
       imageUrls: imageUrls ? imageUrls.SS : [],
+      season: runEntryDocument.season?.S || '',
     };
   }
 }

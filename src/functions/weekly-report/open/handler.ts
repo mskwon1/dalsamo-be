@@ -17,6 +17,9 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
 ) => {
   const { startDate, runEntries } = event.body;
 
+  // TODO : fix, get client value
+  const season = '2024';
+
   const weeklyReportService = new WeeklyReportService(client);
   const runEntryService = new RunEntryService(client);
 
@@ -24,9 +27,10 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
     const weeklyReportId = await weeklyReportService.create({
       startDate,
       status: 'pending',
+      season,
     });
 
-    const { createdItemsCount } = await runEntryService.createMany(
+    const { createdItemsCount } = await runEntryService.createOrUpdateMany(
       _.map(runEntries, (rawEntry) => {
         const { userId, goalDistance, userName } = rawEntry;
 
@@ -36,6 +40,7 @@ const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
           userId,
           userName,
           goalDistance,
+          season,
         };
       })
     );
