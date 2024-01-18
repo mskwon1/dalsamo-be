@@ -15,10 +15,7 @@ const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 const handler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
   event
 ) => {
-  const { startDate, runEntries } = event.body;
-
-  // TODO : fix, get client value
-  const season = '2024';
+  const { startDate, runEntries, season } = event.body;
 
   const weeklyReportService = new WeeklyReportService(client);
   const runEntryService = new RunEntryService(client);

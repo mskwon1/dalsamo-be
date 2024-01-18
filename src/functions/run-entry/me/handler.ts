@@ -2,7 +2,7 @@ import { JWTVerifiedBody, formatErrorResponse } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { Handler } from 'aws-lambda';
+import { APIGatewayProxyEvent, Handler } from 'aws-lambda';
 import _ from 'lodash';
 import httpHeaderNormalizer from '@middy/http-header-normalizer';
 import verifyJwtMiddleware from 'src/middlewares/verifyJwtMiddleware';
@@ -10,14 +10,18 @@ import RunEntryService from 'src/services/runEntryService';
 
 const client = new DynamoDBClient({ region: 'ap-northeast-2' });
 
-const getUserRunEntries: Handler<JWTVerifiedBody> = async (event) => {
-  const { auth } = event;
+const getUserRunEntries: Handler<
+  JWTVerifiedBody & APIGatewayProxyEvent
+> = async (event) => {
+  const { auth, queryStringParameters } = event;
+  const season = queryStringParameters?.season;
 
   const runEntryService = new RunEntryService(client);
 
   try {
     const runEntries = await runEntryService.findAllByUser(
-      auth.payload.id as string
+      auth.payload.id as string,
+      { season }
     );
 
     console.log(runEntries);
