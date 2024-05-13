@@ -96,7 +96,6 @@ class WeeklyReportService {
     const readWeeklyReportsCommand = new QueryCommand({
       TableName: DALSAMO_SINGLE_TABLE,
       IndexName: DBIndexName.ET_PK,
-      Limit: limit,
       KeyConditionExpression: 'EntityType = :pk_val',
       FilterExpression: season ? 'season = :season' : undefined,
       ExpressionAttributeValues: _.omitBy(
@@ -112,7 +111,10 @@ class WeeklyReportService {
       readWeeklyReportsCommand
     );
 
-    return _.map(weeklyReports, WeeklyReportService.parseWeeklyReportDocument);
+    return _.map(
+      _.slice(weeklyReports, 0, limit),
+      WeeklyReportService.parseWeeklyReportDocument
+    );
   }
 
   async createOrUpdateMany(
